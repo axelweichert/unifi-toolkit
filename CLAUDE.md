@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**UniFi Toolkit** is a comprehensive monorepo containing multiple tools for UniFi network management and monitoring. Each tool operates independently but shares common infrastructure for UniFi API access, database management, and configuration.
+**UniFi Toolkit** (v1.1.0) is a comprehensive monorepo containing multiple tools for UniFi network management and monitoring. Each tool operates independently but shares common infrastructure for UniFi API access, database management, and configuration.
 
 **Current Tools:**
 - **Wi-Fi Stalker v0.6.0** - Track specific client devices, monitor roaming, and maintain connection history
@@ -12,6 +12,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Planned Tools:**
 - **IDS Monitor** - View IDS/IPS events, blocked IPs, and security alerts
 - **Product Recommender** - AI-powered UniFi equipment recommendations
+
+## Branding
+
+The application uses **Crosstalk Solutions** branding:
+- **Logo**: `/app/static/images/2022-Crosstalk-Solutions-Logo.png`
+- **Icon**: `/app/static/images/2022-Crosstalk-Solutions-Icon.png`
+- **Favicon**: `/app/static/images/favicon16x16.jpg`
+- **Brand Colors**:
+  - Blue (primary): `#2B3990`
+  - Orange (accent): `#F15A29`
+  - Grey (secondary): `#939598`
+
+## Dark Mode
+
+The application supports dark/light mode toggle:
+- Toggle button in dashboard header (upper right)
+- Theme preference stored in `localStorage` with key `unifi-toolkit-theme`
+- CSS uses `:root[data-theme="dark"]` selector for dark mode variables
+- Theme persists across page navigation and sub-applications
+- Both dashboard and Wi-Fi Stalker CSS files have matching theme variable definitions
 
 ## Architecture
 
@@ -22,6 +42,8 @@ unifi-toolkit/
 ├── app/                    # Main unified application
 │   ├── main.py            # FastAPI app entry point, mounts all tools
 │   ├── static/            # Main dashboard static files
+│   │   ├── css/           # Dashboard styles (includes dark mode)
+│   │   └── images/        # Branding assets (logo, favicon)
 │   └── templates/         # Main dashboard templates
 ├── shared/                # Shared infrastructure (all tools use this)
 │   ├── config.py          # Pydantic settings (loads from .env)
@@ -238,6 +260,12 @@ See routers/*.py for full endpoint definitions.
 - **Styles**: `tools/wifi_stalker/static/css/styles.css`
 
 Uses Alpine.js for reactivity. WebSocket connection for real-time updates.
+
+### Navigation
+
+- Each sub-tool has a "Back to Dashboard" link in its header
+- The main dashboard at `/` shows all available tools as cards
+- Theme preference (dark/light) persists across navigation via localStorage
 
 ## Database Migrations (Alembic)
 

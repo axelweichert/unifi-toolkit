@@ -19,19 +19,187 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <div class="theme-toggle">
-                    <span class="theme-toggle-label" id="theme-label">Light</span>
-                    <button class="theme-toggle-btn" id="theme-toggle" title="Toggle dark/light mode">
-                        <span id="theme-icon">🌙</span>
-                    </button>
+                <div class="header-left">
+                    <img src="/static/images/2022-Crosstalk-Solutions-Logo.png" alt="Crosstalk Solutions" class="header-logo">
                 </div>
-                <div class="header-logo">
-                    <img src="/static/images/2022-Crosstalk-Solutions-Logo.png" alt="Crosstalk Solutions">
+                <div class="header-center">
+                    <h1>UI Toolkit</h1>
                 </div>
-                <h1>🛠️ UI Toolkit</h1>
-                <p class="subtitle">Comprehensive toolkit for UniFi network management and monitoring</p>
+                <div class="header-right">
+                    <div class="theme-toggle">
+                        <span class="theme-toggle-label" id="theme-label">Light</span>
+                        <button class="theme-toggle-btn" id="theme-toggle" title="Toggle dark/light mode">
+                            <span id="theme-icon">🌙</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </header>
+
+        <!-- System Status Widget -->
+        <section class="system-status" id="system-status">
+            <div class="status-header" id="status-header">
+                <div class="status-summary">
+                    <div class="status-item" id="gateway-status">
+                        <span class="status-icon">🔌</span>
+                        <span class="status-label">Gateway</span>
+                        <span class="status-value" id="gateway-model">--</span>
+                    </div>
+                    <div class="status-item" id="cpu-status">
+                        <span class="status-icon">⚡</span>
+                        <span class="status-label">CPU</span>
+                        <span class="status-value" id="cpu-value">--%</span>
+                    </div>
+                    <div class="status-item" id="ram-status">
+                        <span class="status-icon">💾</span>
+                        <span class="status-label">RAM</span>
+                        <span class="status-value" id="ram-value">--%</span>
+                    </div>
+                    <div class="status-item" id="uptime-status">
+                        <span class="status-icon">⏱️</span>
+                        <span class="status-label">Uptime</span>
+                        <span class="status-value" id="uptime-value">--</span>
+                    </div>
+                    <div class="status-item" id="wan-status">
+                        <span class="status-icon" id="wan-icon">🌐</span>
+                        <span class="status-label">WAN</span>
+                        <span class="status-value" id="wan-value">--</span>
+                    </div>
+                    <div class="status-item" id="clients-status">
+                        <span class="status-icon">📱</span>
+                        <span class="status-label">Clients</span>
+                        <span class="status-value" id="clients-value">--</span>
+                    </div>
+                </div>
+                <button class="status-expand-btn" id="status-expand-btn" title="Show details">
+                    <span id="expand-icon">▼</span>
+                </button>
+            </div>
+            <div class="status-details" id="status-details">
+                <div class="status-details-grid">
+                    <!-- Device Counts -->
+                    <div class="detail-card">
+                        <h4>Network Devices</h4>
+                        <div class="detail-list">
+                            <div class="detail-row">
+                                <span>Access Points</span>
+                                <span id="ap-count">--</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Switches</span>
+                                <span id="switch-count">--</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Connected Clients</span>
+                                <span id="client-count-detail">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Gateway Details -->
+                    <div class="detail-card">
+                        <h4>Gateway Info</h4>
+                        <div class="detail-list">
+                            <div class="detail-row">
+                                <span>Model</span>
+                                <span id="gateway-model-detail">--</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Firmware</span>
+                                <span id="gateway-version">--</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>WAN IP</span>
+                                <span id="wan-ip">--</span>
+                            </div>
+                            <div class="detail-row" id="wan2-row" style="display: none;">
+                                <span>WAN2 IP</span>
+                                <span id="wan2-ip">--</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>WAN Uptime</span>
+                                <span id="wan-availability">--</span>
+                            </div>
+                            <div class="detail-row" id="wan2-availability-row" style="display: none;">
+                                <span>WAN2 Uptime</span>
+                                <span id="wan2-availability">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Speedtest Results -->
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <h4>Speedtest Results</h4>
+                            <button class="speedtest-btn" id="speedtest-btn" title="Run Speedtest">
+                                <span id="speedtest-icon">▶</span>
+                            </button>
+                        </div>
+                        <div class="detail-list">
+                            <div class="detail-row">
+                                <span>Download</span>
+                                <span id="download-speed">--</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Upload</span>
+                                <span id="upload-speed">--</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Latency</span>
+                                <span id="latency">--</span>
+                            </div>
+                        </div>
+                        <div class="speedtest-status" id="speedtest-status"></div>
+                    </div>
+                    <!-- Network Health -->
+                    <div class="detail-card">
+                        <h4>Network Health</h4>
+                        <div class="detail-list">
+                            <div class="detail-row">
+                                <span class="health-label-group">
+                                    <span>WAN</span>
+                                    <span class="health-reason" id="wan-reason"></span>
+                                </span>
+                                <span class="health-badge" id="wan-health">--</span>
+                            </div>
+                            <div class="detail-row" id="wan2-health-row" style="display: none;">
+                                <span class="health-label-group">
+                                    <span>WAN2</span>
+                                    <span class="health-reason" id="wan2-reason"></span>
+                                </span>
+                                <span class="health-badge" id="wan2-health">--</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="health-label-group">
+                                    <span>LAN</span>
+                                    <span class="health-reason" id="lan-reason"></span>
+                                </span>
+                                <span class="health-badge" id="lan-health">--</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="health-label-group">
+                                    <span>WLAN</span>
+                                    <span class="health-reason" id="wlan-reason"></span>
+                                </span>
+                                <span class="health-badge" id="wlan-health">--</span>
+                            </div>
+                            <div class="detail-row" id="vpn-health-row" style="display: none;">
+                                <span class="health-label-group">
+                                    <span>VPN</span>
+                                    <span class="health-reason" id="vpn-reason"></span>
+                                </span>
+                                <span class="health-badge" id="vpn-health">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="status-loading" id="status-loading">
+                <span>Loading system status...</span>
+            </div>
+            <div class="status-error" id="status-error">
+                <span id="error-message">Unable to connect</span>
+                <a href="/stalker/" class="configure-link">Configure UniFi Connection</a>
+            </div>
+        </section>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -50,7 +218,6 @@
                         <span class="feature-badge">Device Tracking</span>
                         <span class="feature-badge">Roaming Detection</span>
                         <span class="feature-badge">History Logs</span>
-                        <span class="feature-badge">Webhooks</span>
                     </div>
                     <div class="tool-actions">
                         <a href="/stalker/" class="btn btn-primary">Open Wi-Fi Stalker</a>
@@ -58,20 +225,23 @@
                     <div class="tool-version">v0.7.0</div>
                 </div>
 
-                <!-- Placeholder for future tools -->
-                <div class="tool-card tool-card-coming-soon">
+                <!-- Threat Watch Tool -->
+                <div class="tool-card">
                     <div class="tool-icon">🛡️</div>
-                    <h2>IDS Monitor</h2>
+                    <h2>Threat Watch</h2>
                     <p class="tool-description">
-                        Monitor IDS/IPS events, view blocked IPs and threat alerts, and manage
-                        security rules across your UniFi network.
+                        Monitor IDS/IPS events in real-time, view blocked threats and top attackers,
+                        and analyze security trends across your UniFi network.
                     </p>
                     <div class="tool-features">
-                        <span class="feature-badge feature-badge-disabled">Coming Soon</span>
+                        <span class="feature-badge">IDS/IPS Events</span>
+                        <span class="feature-badge">Top Attackers</span>
+                        <span class="feature-badge">Geo Lookup</span>
                     </div>
                     <div class="tool-actions">
-                        <button class="btn btn-disabled" disabled>Coming Soon</button>
+                        <a href="/threats/" class="btn btn-primary">Open Threat Watch</a>
                     </div>
+                    <div class="tool-version">v0.1.0</div>
                 </div>
 
                 <div class="tool-card">
@@ -139,7 +309,7 @@
         <footer class="footer">
             <p>
                 <a href="https://github.com/Crosstalk-Solutions/unifi-toolkit" target="_blank">UI Toolkit</a>
-                v1.2.0 | by
+                v1.3.0 | by
                 <a href="https://www.crosstalksolutions.com" target="_blank">Crosstalk Solutions</a>
             </p>
             <p class="footer-links">
@@ -184,6 +354,232 @@
                 localStorage.setItem('unifi-toolkit-theme', newTheme);
                 updateThemeUI(newTheme);
             });
+        })();
+
+        // System Status Widget
+        (function() {
+            const statusHeader = document.getElementById('status-header');
+            const statusDetails = document.getElementById('status-details');
+            const statusExpandBtn = document.getElementById('status-expand-btn');
+            const statusLoading = document.getElementById('status-loading');
+            const statusError = document.getElementById('status-error');
+            const errorMessage = document.getElementById('error-message');
+
+            // Format uptime from seconds to human readable
+            function formatUptime(seconds) {
+                if (!seconds) return '--';
+                const days = Math.floor(seconds / 86400);
+                const hours = Math.floor((seconds % 86400) / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+
+                if (days > 0) {
+                    return `${days}d ${hours}h`;
+                } else if (hours > 0) {
+                    return `${hours}h ${minutes}m`;
+                } else {
+                    return `${minutes}m`;
+                }
+            }
+
+            // Format speed in Mbps
+            function formatSpeed(mbps) {
+                if (!mbps) return '--';
+                return `${Math.round(mbps)} Mbps`;
+            }
+
+            // Set health badge and reason
+            function setHealthBadge(elementId, status, reason) {
+                const element = document.getElementById(elementId);
+                if (!element) return;
+
+                element.textContent = status || '--';
+                element.className = 'health-badge';
+
+                if (status === 'ok') {
+                    element.classList.add('ok');
+                    element.textContent = 'OK';
+                } else if (status === 'warning') {
+                    element.classList.add('warning');
+                    element.textContent = 'WARN';
+                } else if (status === 'error' || status === 'unknown') {
+                    element.classList.add('error');
+                    element.textContent = status === 'unknown' ? 'N/A' : 'ERR';
+                }
+
+                // Set the reason if provided
+                const reasonId = elementId.replace('-health', '-reason');
+                const reasonElement = document.getElementById(reasonId);
+                if (reasonElement) {
+                    reasonElement.textContent = reason || '';
+                }
+            }
+
+            // Toggle accordion
+            statusExpandBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isExpanded = statusDetails.classList.contains('expanded');
+                statusDetails.classList.toggle('expanded');
+                statusExpandBtn.classList.toggle('expanded');
+            });
+
+            // Also toggle when clicking header
+            statusHeader.addEventListener('click', function() {
+                const isExpanded = statusDetails.classList.contains('expanded');
+                statusDetails.classList.toggle('expanded');
+                statusExpandBtn.classList.toggle('expanded');
+            });
+
+            // Load system status
+            async function loadSystemStatus() {
+                statusLoading.classList.add('visible');
+                statusHeader.classList.add('hidden');
+                statusError.classList.remove('visible');
+
+                try {
+                    const response = await fetch('/api/system-status');
+                    const data = await response.json();
+
+                    statusLoading.classList.remove('visible');
+
+                    if (!data.configured) {
+                        statusError.classList.add('visible');
+                        errorMessage.textContent = 'UniFi controller not configured';
+                        return;
+                    }
+
+                    if (!data.connected) {
+                        statusError.classList.add('visible');
+                        errorMessage.textContent = data.error || 'Unable to connect to UniFi controller';
+                        return;
+                    }
+
+                    // Show the status header
+                    statusHeader.classList.remove('hidden');
+
+                    const system = data.system;
+                    const health = data.health || {};
+
+                    // Update summary values
+                    document.getElementById('gateway-model').textContent = system.gateway_model || 'Unknown';
+                    document.getElementById('cpu-value').textContent = system.cpu_utilization ? `${Math.round(system.cpu_utilization)}%` : '--%';
+                    document.getElementById('ram-value').textContent = system.mem_utilization ? `${Math.round(system.mem_utilization)}%` : '--%';
+                    document.getElementById('uptime-value').textContent = formatUptime(system.uptime);
+                    document.getElementById('wan-value').textContent = system.wan_status === 'connected' ? 'Online' : 'Offline';
+                    document.getElementById('wan-icon').textContent = system.wan_status === 'connected' ? '🟢' : '🔴';
+                    document.getElementById('clients-value').textContent = system.client_count || '0';
+
+                    // Update detail values
+                    document.getElementById('ap-count').textContent = system.ap_count || '0';
+                    document.getElementById('switch-count').textContent = system.switch_count || '0';
+                    document.getElementById('client-count-detail').textContent = system.client_count || '0';
+                    document.getElementById('gateway-model-detail').textContent = system.gateway_model || 'Unknown';
+                    document.getElementById('gateway-version').textContent = system.gateway_version || '--';
+                    document.getElementById('wan-ip').textContent = system.wan_ip || '--';
+
+                    // WAN availability from health stats
+                    const wanAvail = health.wan?.availability;
+                    document.getElementById('wan-availability').textContent = wanAvail ? `${wanAvail.toFixed(2)}%` : '--';
+
+                    // Check for WAN2 (multi-WAN)
+                    if (health.wan2) {
+                        document.getElementById('wan2-row').style.display = 'flex';
+                        document.getElementById('wan2-availability-row').style.display = 'flex';
+                        document.getElementById('wan2-ip').textContent = health.wan2.wan_ip || '--';
+                        const wan2Avail = health.wan2.availability;
+                        document.getElementById('wan2-availability').textContent = wan2Avail ? `${wan2Avail.toFixed(2)}%` : '--';
+                    } else {
+                        document.getElementById('wan2-row').style.display = 'none';
+                        document.getElementById('wan2-availability-row').style.display = 'none';
+                    }
+
+                    // Speedtest results - use www latency if speedtest latency is 0
+                    document.getElementById('download-speed').textContent = formatSpeed(system.download_speed);
+                    document.getElementById('upload-speed').textContent = formatSpeed(system.upload_speed);
+                    const latencyValue = system.latency || health.www?.latency;
+                    document.getElementById('latency').textContent = latencyValue ? `${Math.round(latencyValue)} ms` : '--';
+
+                    // Update health badges with reasons
+                    setHealthBadge('wan-health', health.wan?.status, health.wan?.status_reason);
+                    setHealthBadge('lan-health', health.lan?.status, health.lan?.status_reason);
+                    setHealthBadge('wlan-health', health.wlan?.status, health.wlan?.status_reason);
+
+                    // WAN2 health (multi-WAN)
+                    if (health.wan2) {
+                        document.getElementById('wan2-health-row').style.display = 'flex';
+                        setHealthBadge('wan2-health', health.wan2.status, health.wan2.status_reason);
+                    } else {
+                        document.getElementById('wan2-health-row').style.display = 'none';
+                    }
+
+                    // VPN health - only show if configured (not in error state with "not configured")
+                    if (health.vpn && !(health.vpn.status === 'error' && health.vpn.status_reason === 'not configured')) {
+                        document.getElementById('vpn-health-row').style.display = 'flex';
+                        setHealthBadge('vpn-health', health.vpn.status, health.vpn.status_reason);
+                    } else {
+                        document.getElementById('vpn-health-row').style.display = 'none';
+                    }
+
+                    // Handle speedtest error - disable button if speedtest is broken
+                    if (health.www?.speedtest_error) {
+                        speedtestBtn.disabled = true;
+                        speedtestBtn.title = 'Speedtest not available';
+                        speedtestStatus.textContent = 'Speedtest not available on this gateway';
+                    }
+
+                } catch (error) {
+                    console.error('Failed to load system status:', error);
+                    statusLoading.classList.remove('visible');
+                    statusError.classList.add('visible');
+                    errorMessage.textContent = 'Failed to load system status';
+                }
+            }
+
+            // Speedtest functionality
+            const speedtestBtn = document.getElementById('speedtest-btn');
+            const speedtestIcon = document.getElementById('speedtest-icon');
+            const speedtestStatus = document.getElementById('speedtest-status');
+
+            speedtestBtn.addEventListener('click', async function(e) {
+                e.stopPropagation(); // Prevent accordion toggle
+
+                // Disable button and show running state
+                speedtestBtn.disabled = true;
+                speedtestBtn.classList.add('running');
+                speedtestIcon.textContent = '...';
+                speedtestStatus.textContent = 'Starting speedtest...';
+
+                try {
+                    const response = await fetch('/api/speedtest', { method: 'POST' });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        speedtestStatus.textContent = 'Speedtest running... results will update shortly';
+                        // Poll for results after a delay
+                        setTimeout(async () => {
+                            await loadSystemStatus();
+                            speedtestStatus.textContent = 'Speedtest complete!';
+                            setTimeout(() => {
+                                speedtestStatus.textContent = '';
+                            }, 3000);
+                        }, 30000); // Wait 30 seconds for speedtest to complete
+                    } else {
+                        speedtestStatus.textContent = data.error || 'Failed to start speedtest';
+                    }
+                } catch (error) {
+                    console.error('Speedtest error:', error);
+                    speedtestStatus.textContent = 'Error starting speedtest';
+                } finally {
+                    speedtestBtn.disabled = false;
+                    speedtestBtn.classList.remove('running');
+                    speedtestIcon.textContent = '▶';
+                }
+            });
+
+            // Load on page load
+            loadSystemStatus();
+
+            // Refresh every 60 seconds
+            setInterval(loadSystemStatus, 60000);
         })();
     </script>
 </body>

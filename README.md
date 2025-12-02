@@ -4,6 +4,18 @@ A suite of tools for UniFi network management.
 
 > **Note:** This project is not affiliated with, endorsed by, or sponsored by Ubiquiti Inc. UniFi is a trademark of Ubiquiti Inc.
 
+## Dashboard
+
+The main dashboard displays real-time system status including:
+- **Gateway Info** - Model name, firmware version, uptime
+- **Resource Usage** - CPU and RAM utilization
+- **Network Health** - Status of WAN, LAN, WLAN, VPN subsystems with reasons for any warnings
+- **Connected Clients** - Wired and wireless client counts
+- **WAN Status** - IP address, ISP, latency, uptime percentage (supports multi-WAN)
+- **Speedtest** - Trigger speedtest and view results (where supported by gateway)
+
+The status widget has a condensed view with an expandable accordion for full details.
+
 ## Tools
 
 ### Wi-Fi Stalker
@@ -11,8 +23,10 @@ Track specific Wi-Fi client devices through UniFi infrastructure. Monitor connec
 
 **Features:** Device tracking, roaming detection, connection history, webhooks (Slack/Discord/n8n)
 
-### IDS Monitor *(Coming Soon)*
-View blocked IPs and intrusion detection/prevention system events.
+### Threat Watch
+Monitor IDS/IPS events from your UniFi gateway. View blocked threats, analyze attack patterns, and configure webhook alerts.
+
+**Features:** Event monitoring, threat categorization, source/destination analysis, webhooks (Slack/Discord/n8n)
 
 ### UI Product Selector *(External)*
 Build the perfect UniFi network at [uiproductselector.com](https://uiproductselector.com)

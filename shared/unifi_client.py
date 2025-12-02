@@ -4,11 +4,108 @@ UniFi API client wrapper using aiounifi
 from typing import Optional, Dict, List
 import aiohttp
 from aiounifi.controller import Controller
+from aiounifi.models.configuration import Configuration
 from aiounifi.models.client import Client
 import ssl
 import logging
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
+
+# UniFi device model code to friendly name mapping
+UNIFI_MODEL_NAMES = {
+    # Gateways / Dream Machines
+    "UDMA6A8": "UCG Fiber",
+    "UDMPRO": "UDM Pro",
+    "UDMPROMAX": "UDM Pro Max",
+    "UDM": "UDM",
+    "UDMSE": "UDM SE",
+    "UDR": "UDR",
+    "UDW": "UDW",
+    "UXG": "UXG Pro",
+    "UXGPRO": "UXG Pro",
+    "UXGLITE": "UXG Lite",
+    "UCG": "UCG",
+    "UCGMAX": "UCG Max",
+    "USG": "USG",
+    "USG3P": "USG 3P",
+    "USG4P": "USG Pro 4",
+    "USGP4": "USG Pro 4",
+    # Access Points
+    "U7PROMAX": "U7 Pro Max",
+    "U7PRO": "U7 Pro",
+    "U7PIW": "U7 Pro Wall",
+    "U7LR": "U7 LR",
+    "U7UKU": "UK Ultra",
+    "U6PRO": "U6 Pro",
+    "U6LR": "U6 LR",
+    "U6LITE": "U6 Lite",
+    "U6PLUS": "U6+",
+    "UAPL6": "U6+",
+    "U6MESH": "U6 Mesh",
+    "U6ENT": "U6 Enterprise",
+    "U6ENTIWP": "U6 Enterprise In-Wall",
+    "UAP6MP": "U6 Mesh Pro",
+    "UAPAC": "UAP AC",
+    "UAPACLITE": "UAP AC Lite",
+    "UAPACLR": "UAP AC LR",
+    "UAPACPRO": "UAP AC Pro",
+    "UAPACHD": "UAP AC HD",
+    "UAPACSHD": "UAP AC SHD",
+    "UAPIW": "UAP In-Wall",
+    "UAPIWPRO": "UAP In-Wall Pro",
+    "UAPNANOHD": "UAP nanoHD",
+    "UAPFLEXHD": "UAP FlexHD",
+    "UAPBEACONHD": "UAP BeaconHD",
+    # Switches
+    "USPM16P": "USW Pro Max 16 PoE",
+    "USPM24P": "USW Pro Max 24 PoE",
+    "USPM48P": "USW Pro Max 48 PoE",
+    "USPPRO24": "USW Pro 24",
+    "USPPRO24P": "USW Pro 24 PoE",
+    "USPPRO48": "USW Pro 48",
+    "USPPRO48P": "USW Pro 48 PoE",
+    "USW24P250": "USW 24 PoE 250W",
+    "USW24P450": "USW 24 PoE 450W",
+    "USW48P750": "USW 48 PoE 750W",
+    "USW48": "USW 48",
+    "USW24": "USW 24",
+    "USW16P150": "USW 16 PoE 150W",
+    "USW8P150": "USW 8 PoE 150W",
+    "USW8P60": "USW 8 PoE 60W",
+    "USL8LP": "USW Lite 8 PoE",
+    "USL16LP": "USW Lite 16 PoE",
+    "USWED35": "USW Flex 2.5G 5",
+    "USWED37": "USW Flex 2.5G 8 PoE",
+    "USWED76": "USW Pro XG 8 PoE",
+    "USM8P": "USW Ultra",
+    "USM8P210": "USW Ultra 210W",
+    "USC8P450": "USW Industrial",
+    "USF5P": "USW Flex",
+    "USMINI": "USW Flex Mini",
+    "USPRPS": "USP RPS",
+    # Building Bridge
+    "UBB": "UBB",
+    # Cloud Keys
+    "UCK": "Cloud Key",
+    "UCKG2": "Cloud Key Gen2",
+    "UCKP": "Cloud Key Gen2 Plus",
+}
+
+
+def get_friendly_model_name(model_code: str) -> str:
+    """
+    Convert a UniFi model code to a friendly name
+
+    Args:
+        model_code: The internal model code (e.g., "UDMA6A8")
+
+    Returns:
+        Friendly name if known, otherwise the original code
+    """
+    if not model_code:
+        return "Unknown"
+    return UNIFI_MODEL_NAMES.get(model_code.upper(), model_code)
 
 
 class UniFiClient:
@@ -86,15 +183,24 @@ class UniFiClient:
                 logger.info(f"Successfully connected to UniFi OS at {self.host}")
                 return True
             else:
-                # Legacy - use aiounifi Controller
-                self.controller = Controller(
-                    host=self.host,
+                # Legacy - use aiounifi Controller with Configuration object
+                # Parse host and port from URL
+                parsed = urlparse(self.host)
+                host = parsed.hostname or self.host
+                port = parsed.port or 8443
+
+                # Create Configuration object (aiounifi v85+ API)
+                config = Configuration(
                     session=self._session,
+                    host=host,
                     username=self.username,
                     password=self.password,
+                    port=port,
                     site=self.site,
-                    ssl_context=ssl_context
+                    ssl_context=ssl_context if ssl_context else False
                 )
+
+                self.controller = Controller(config)
 
                 # Login to controller
                 await self.controller.login()
@@ -401,6 +507,381 @@ class UniFiClient:
         except Exception as e:
             logger.error(f"Error setting name for {mac_address}: {e}")
             return False
+
+    async def get_ips_events(
+        self,
+        start: int = None,
+        end: int = None,
+        limit: int = 10000
+    ) -> List[Dict]:
+        """
+        Get IDS/IPS threat events from the UniFi controller
+
+        Args:
+            start: Start timestamp in milliseconds (default: 24 hours ago)
+            end: End timestamp in milliseconds (default: now)
+            limit: Maximum number of events to return (default: 10000)
+
+        Returns:
+            List of IDS/IPS event dictionaries
+        """
+        if not self._session:
+            raise RuntimeError("Not connected to UniFi controller. Call connect() first.")
+
+        try:
+            # Build request payload
+            import time
+            now_ms = int(time.time() * 1000)
+            day_ago_ms = now_ms - (24 * 60 * 60 * 1000)
+
+            payload = {
+                "start": start or day_ago_ms,
+                "end": end or now_ms,
+                "_limit": limit
+            }
+
+            if self.is_unifi_os:
+                url = f"{self.host}/proxy/network/api/s/{self.site}/stat/ips/event"
+            else:
+                url = f"{self.host}/api/s/{self.site}/stat/ips/event"
+
+            async with self._session.post(url, json=payload) as resp:
+                if resp.status != 200:
+                    logger.error(f"Failed to get IPS events: {resp.status}")
+                    return []
+
+                data = await resp.json()
+                events = data.get('data', [])
+                logger.info(f"Retrieved {len(events)} IPS events from UniFi")
+                return events
+
+        except Exception as e:
+            logger.error(f"Failed to get IPS events from UniFi controller: {e}")
+            return []
+
+    async def get_system_info(self) -> Dict:
+        """
+        Get system information including gateway model, health, and stats
+
+        Returns:
+            Dictionary with system info including:
+            - gateway_model: Gateway device model
+            - gateway_name: Gateway friendly name
+            - gateway_version: Firmware version
+            - uptime: Gateway uptime in seconds
+            - cpu_utilization: CPU usage percentage
+            - mem_utilization: Memory usage percentage
+            - wan_status: WAN connection status
+            - wan_ip: WAN IP address
+            - speedtest_status: Latest speedtest results
+        """
+        if not self._session:
+            raise RuntimeError("Not connected to UniFi controller. Call connect() first.")
+
+        try:
+            result = {
+                "gateway_model": None,
+                "gateway_name": None,
+                "gateway_version": None,
+                "uptime": None,
+                "cpu_utilization": None,
+                "mem_utilization": None,
+                "wan_status": None,
+                "wan_ip": None,
+                "download_speed": None,
+                "upload_speed": None,
+                "latency": None,
+                "is_hosted": False,
+                "devices": [],
+                "client_count": 0,
+                "ap_count": 0,
+                "switch_count": 0,
+            }
+
+            # Get all devices
+            if self.is_unifi_os:
+                url = f"{self.host}/proxy/network/api/s/{self.site}/stat/device"
+            else:
+                url = f"{self.host}/api/s/{self.site}/stat/device"
+
+            async with self._session.get(url) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    devices = data.get('data', [])
+
+                    for device in devices:
+                        device_type = device.get('type', '')
+
+                        # Count device types
+                        if device_type == 'uap':
+                            result['ap_count'] += 1
+                        elif device_type == 'usw':
+                            result['switch_count'] += 1
+
+                        # Find gateway (UDM, USG, UCG, UXG)
+                        if device_type in ('ugw', 'udm', 'uxg'):
+                            model_code = device.get('model', 'Unknown')
+                            result['gateway_model'] = get_friendly_model_name(model_code)
+                            result['gateway_name'] = device.get('name', result['gateway_model'])
+                            result['gateway_version'] = device.get('version', 'Unknown')
+                            result['uptime'] = device.get('uptime')
+
+                            # System stats
+                            system_stats = device.get('system-stats', {})
+                            if system_stats:
+                                cpu = system_stats.get('cpu')
+                                mem = system_stats.get('mem')
+                                result['cpu_utilization'] = float(cpu) if cpu else None
+                                result['mem_utilization'] = float(mem) if mem else None
+
+                            # WAN info from uplink
+                            uplink = device.get('uplink', {})
+                            if uplink:
+                                result['wan_ip'] = uplink.get('ip')
+                                result['wan_status'] = 'connected' if uplink.get('up') else 'disconnected'
+
+                            # Speedtest results
+                            speedtest = device.get('speedtest-status', {})
+                            if speedtest:
+                                result['download_speed'] = speedtest.get('xput_download')
+                                result['upload_speed'] = speedtest.get('xput_upload')
+                                result['latency'] = speedtest.get('latency')
+
+                        # Store device summary
+                        result['devices'].append({
+                            'name': device.get('name', device.get('model', 'Unknown')),
+                            'model': device.get('model'),
+                            'type': device_type,
+                            'mac': device.get('mac'),
+                            'state': device.get('state', 0),
+                            'uptime': device.get('uptime')
+                        })
+
+            # If no gateway found, might be hosted/cloud controller
+            if not result['gateway_model']:
+                result['is_hosted'] = True
+                result['gateway_model'] = 'Cloud Hosted'
+
+            # Get client count
+            clients = await self.get_clients()
+            result['client_count'] = len(clients)
+
+            return result
+
+        except Exception as e:
+            logger.error(f"Failed to get system info: {e}")
+            raise
+
+    async def get_health(self) -> Dict:
+        """
+        Get site health information
+
+        Returns:
+            Dictionary with health subsystems (wan, www, lan, wlan, vpn)
+        """
+        if not self._session:
+            raise RuntimeError("Not connected to UniFi controller. Call connect() first.")
+
+        try:
+            if self.is_unifi_os:
+                url = f"{self.host}/proxy/network/api/s/{self.site}/stat/health"
+            else:
+                url = f"{self.host}/api/s/{self.site}/stat/health"
+
+            async with self._session.get(url) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    health_list = data.get('data', [])
+
+                    # Convert list to dict keyed by subsystem
+                    health = {}
+                    for item in health_list:
+                        subsystem = item.get('subsystem')
+                        if subsystem:
+                            health[subsystem] = {
+                                'status': item.get('status', 'unknown'),
+                                'num_user': item.get('num_user', 0),
+                                'num_guest': item.get('num_guest', 0),
+                                'num_adopted': item.get('num_adopted', 0),
+                                'num_disconnected': item.get('num_disconnected', 0),
+                                'num_pending': item.get('num_pending', 0),
+                                'tx_bytes': item.get('tx_bytes-r', 0),
+                                'rx_bytes': item.get('rx_bytes-r', 0),
+                                'latency': item.get('latency') if subsystem == 'www' else None,
+                            }
+
+                            # WAN-specific fields
+                            if subsystem in ('wan', 'wan2'):
+                                health[subsystem]['wan_ip'] = item.get('wan_ip')
+                                health[subsystem]['isp_name'] = item.get('isp_name')
+                                health[subsystem]['gw_name'] = item.get('gw_name')
+
+                                # Extract uptime stats (availability, latency)
+                                uptime_stats = item.get('uptime_stats', {})
+                                wan_key = 'WAN' if subsystem == 'wan' else 'WAN2'
+                                wan_stats = uptime_stats.get(wan_key, {})
+                                health[subsystem]['availability'] = wan_stats.get('availability')
+                                health[subsystem]['latency_avg'] = wan_stats.get('latency_average')
+
+                                # Gateway system stats
+                                gw_stats = item.get('gw_system-stats', {})
+                                if gw_stats:
+                                    health[subsystem]['uptime'] = gw_stats.get('uptime')
+
+                            # WWW-specific: check speedtest status (regardless of overall status)
+                            if subsystem == 'www':
+                                speedtest_status = item.get('speedtest_status')
+                                if speedtest_status and speedtest_status.lower() == 'error':
+                                    health[subsystem]['speedtest_error'] = True
+
+                            # Build a reason string for non-ok status
+                            if item.get('status') != 'ok':
+                                reasons = []
+                                num_disconnected = item.get('num_disconnected', 0)
+                                num_pending = item.get('num_pending', 0)
+                                num_disabled = item.get('num_disabled', 0)
+
+                                if num_disconnected > 0:
+                                    device_type = 'APs' if subsystem == 'wlan' else 'switches' if subsystem == 'lan' else 'devices'
+                                    reasons.append(f"{num_disconnected} {device_type} offline")
+                                if num_pending > 0:
+                                    reasons.append(f"{num_pending} pending adoption")
+                                if num_disabled > 0:
+                                    reasons.append(f"{num_disabled} disabled")
+
+                                # VPN-specific: no VPN configured often shows as error
+                                if subsystem == 'vpn' and not reasons:
+                                    reasons.append("not configured")
+
+                                # WAN-specific issues
+                                if subsystem in ('wan', 'wan2'):
+                                    if not item.get('wan_ip'):
+                                        reasons.append("no IP assigned")
+                                    # Check for high latency or low availability
+                                    uptime_stats = item.get('uptime_stats', {})
+                                    wan_key = 'WAN' if subsystem == 'wan' else 'WAN2'
+                                    wan_stats = uptime_stats.get(wan_key, {})
+                                    availability = wan_stats.get('availability', 100)
+                                    if availability < 99:
+                                        reasons.append(f"{availability:.1f}% uptime")
+
+                                health[subsystem]['status_reason'] = ', '.join(reasons) if reasons else None
+
+                    return health
+                else:
+                    logger.error(f"Failed to get health: {resp.status}")
+                    return {}
+
+        except Exception as e:
+            logger.error(f"Failed to get health info: {e}")
+            return {}
+
+    async def get_wan_stats(self) -> Dict:
+        """
+        Get WAN statistics including uptime and throughput
+
+        Returns:
+            Dictionary with WAN stats for each WAN interface
+        """
+        if not self._session:
+            raise RuntimeError("Not connected to UniFi controller. Call connect() first.")
+
+        try:
+            # Get health for basic WAN info
+            health = await self.get_health()
+            wan_health = health.get('wan', {})
+
+            result = {
+                'status': wan_health.get('status', 'unknown'),
+                'wan_ip': wan_health.get('wan_ip'),
+                'isp_name': wan_health.get('isp_name'),
+                'tx_bytes_rate': wan_health.get('tx_bytes', 0),
+                'rx_bytes_rate': wan_health.get('rx_bytes', 0),
+            }
+
+            return result
+
+        except Exception as e:
+            logger.error(f"Failed to get WAN stats: {e}")
+            return {}
+
+    async def run_speedtest(self) -> Dict:
+        """
+        Trigger a speedtest on the UniFi gateway
+
+        Returns:
+            Dictionary with speedtest status
+        """
+        if not self._session:
+            raise RuntimeError("Not connected to UniFi controller. Call connect() first.")
+
+        try:
+            if self.is_unifi_os:
+                url = f"{self.host}/proxy/network/api/s/{self.site}/cmd/devmgr"
+            else:
+                url = f"{self.host}/api/s/{self.site}/cmd/devmgr"
+
+            payload = {"cmd": "speedtest"}
+
+            async with self._session.post(url, json=payload) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    logger.info("Speedtest triggered successfully")
+                    return {
+                        "success": True,
+                        "message": "Speedtest started"
+                    }
+                else:
+                    logger.error(f"Failed to trigger speedtest: {resp.status}")
+                    return {
+                        "success": False,
+                        "error": f"API returned status {resp.status}"
+                    }
+
+        except Exception as e:
+            logger.error(f"Failed to trigger speedtest: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
+    async def get_speedtest_status(self) -> Dict:
+        """
+        Get the current speedtest status/results
+
+        Returns:
+            Dictionary with speedtest results
+        """
+        if not self._session:
+            raise RuntimeError("Not connected to UniFi controller. Call connect() first.")
+
+        try:
+            if self.is_unifi_os:
+                url = f"{self.host}/proxy/network/api/s/{self.site}/cmd/devmgr"
+            else:
+                url = f"{self.host}/api/s/{self.site}/cmd/devmgr"
+
+            payload = {"cmd": "speedtest-status"}
+
+            async with self._session.post(url, json=payload) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    return {
+                        "success": True,
+                        "data": data.get('data', {})
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": f"API returned status {resp.status}"
+                    }
+
+        except Exception as e:
+            logger.error(f"Failed to get speedtest status: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
 
     async def test_connection(self) -> Dict:
         """

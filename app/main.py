@@ -16,6 +16,8 @@ from shared.config import get_settings
 from shared.websocket_manager import get_ws_manager
 from tools.wifi_stalker.main import create_app as create_stalker_app
 from tools.wifi_stalker.scheduler import start_scheduler, stop_scheduler
+from tools.threat_watch.main import create_app as create_threat_watch_app
+from tools.threat_watch.scheduler import start_scheduler as start_threat_scheduler, stop_scheduler as stop_threat_scheduler
 
 # Configure logging
 logging.basicConfig(
@@ -50,12 +52,22 @@ async def lifespan(app: FastAPI):
     await start_scheduler()
     logger.info("Wi-Fi Stalker scheduler started")
 
+    # Start Threat Watch scheduler
+    logger.info("Starting Threat Watch scheduler...")
+    await start_threat_scheduler()
+    logger.info("Threat Watch scheduler started")
+
     logger.info("UI Toolkit started successfully")
 
     yield
 
     # Shutdown
     logger.info("Shutting down UI Toolkit...")
+
+    # Stop Threat Watch scheduler
+    logger.info("Stopping Threat Watch scheduler...")
+    await stop_threat_scheduler()
+    logger.info("Threat Watch scheduler stopped")
 
     # Stop Wi-Fi Stalker scheduler
     logger.info("Stopping Wi-Fi Stalker scheduler...")
@@ -77,6 +89,10 @@ app = FastAPI(
 stalker_app = create_stalker_app()
 app.mount("/stalker", stalker_app)
 
+# Mount Threat Watch sub-application
+threat_watch_app = create_threat_watch_app()
+app.mount("/threats", threat_watch_app)
+
 # Mount main app static files (for dashboard)
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
@@ -97,13 +113,148 @@ async def health_check():
     """
     Health check endpoint for monitoring
     """
+    from tools.wifi_stalker import __version__ as stalker_version
+    from tools.threat_watch import __version__ as threat_watch_version
+
     return {
         "status": "healthy",
-        "version": "1.1.0",
+        "version": "1.3.0",
         "tools": {
-            "wifi_stalker": "0.6.0"
+            "wifi_stalker": stalker_version,
+            "threat_watch": threat_watch_version
         }
     }
+
+
+@app.get("/api/system-status")
+async def get_system_status():
+    """
+    Get system status including gateway info, health, and stats
+    """
+    from shared.unifi_client import UniFiClient
+    from shared.crypto import decrypt_password, decrypt_api_key
+    from shared.models.unifi_config import UniFiConfig
+
+    db = get_database()
+
+    try:
+        # Get UniFi config from database
+        async for session in db.get_session():
+            from sqlalchemy import select
+            result = await session.execute(select(UniFiConfig))
+            config = result.scalar_one_or_none()
+            break  # Only need one iteration
+
+        if not config:
+            return {
+                "configured": False,
+                "error": "UniFi controller not configured"
+            }
+
+        # Decrypt credentials
+        password = None
+        api_key = None
+        if config.password_encrypted:
+            password = decrypt_password(config.password_encrypted)
+        if config.api_key_encrypted:
+            api_key = decrypt_api_key(config.api_key_encrypted)
+
+        # Create client and get system info
+        client = UniFiClient(
+            host=config.controller_url,
+            username=config.username,
+            password=password,
+            api_key=api_key,
+            site=config.site_id,
+            verify_ssl=config.verify_ssl
+        )
+
+        try:
+            connected = await client.connect()
+            if not connected:
+                return {
+                    "configured": True,
+                    "connected": False,
+                    "error": "Failed to connect to UniFi controller"
+                }
+
+            # Get system info and health
+            system_info = await client.get_system_info()
+            health = await client.get_health()
+
+            return {
+                "configured": True,
+                "connected": True,
+                "system": system_info,
+                "health": health
+            }
+
+        finally:
+            await client.disconnect()
+
+    except Exception as e:
+        logger.error(f"Failed to get system status: {e}")
+        return {
+            "configured": True,
+            "connected": False,
+            "error": str(e)
+        }
+
+
+@app.post("/api/speedtest")
+async def trigger_speedtest():
+    """
+    Trigger a speedtest on the UniFi gateway
+    """
+    from shared.unifi_client import UniFiClient
+    from shared.crypto import decrypt_password, decrypt_api_key
+    from shared.models.unifi_config import UniFiConfig
+
+    db = get_database()
+
+    try:
+        # Get UniFi config from database
+        async for session in db.get_session():
+            from sqlalchemy import select
+            result = await session.execute(select(UniFiConfig))
+            config = result.scalar_one_or_none()
+            break
+
+        if not config:
+            return {"success": False, "error": "UniFi controller not configured"}
+
+        # Decrypt credentials
+        password = None
+        api_key = None
+        if config.password_encrypted:
+            password = decrypt_password(config.password_encrypted)
+        if config.api_key_encrypted:
+            api_key = decrypt_api_key(config.api_key_encrypted)
+
+        # Create client and trigger speedtest
+        client = UniFiClient(
+            host=config.controller_url,
+            username=config.username,
+            password=password,
+            api_key=api_key,
+            site=config.site_id,
+            verify_ssl=config.verify_ssl
+        )
+
+        try:
+            connected = await client.connect()
+            if not connected:
+                return {"success": False, "error": "Failed to connect to UniFi controller"}
+
+            result = await client.run_speedtest()
+            return result
+
+        finally:
+            await client.disconnect()
+
+    except Exception as e:
+        logger.error(f"Failed to trigger speedtest: {e}")
+        return {"success": False, "error": str(e)}
 
 
 @app.websocket("/ws")

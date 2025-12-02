@@ -240,3 +240,183 @@ def format_generic_message(
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "source": "unifi-toolkit"
     }
+
+
+async def deliver_threat_webhook(
+    webhook_url: str,
+    webhook_type: str,
+    threat_message: str,
+    severity: int,
+    action: str,
+    src_ip: str,
+    dest_ip: Optional[str] = None,
+    category: Optional[str] = None,
+    is_test: bool = False
+) -> bool:
+    """
+    Deliver a threat notification webhook
+
+    Args:
+        webhook_url: The webhook URL to send to
+        webhook_type: Type of webhook ('slack', 'discord', 'n8n')
+        threat_message: Description of the threat
+        severity: Severity level (1=High, 2=Medium, 3=Low)
+        action: Action taken ('block' or 'alert')
+        src_ip: Source IP address
+        dest_ip: Destination IP address
+        category: Threat category
+        is_test: Whether this is a test notification
+    """
+    try:
+        # Format message based on webhook type
+        if webhook_type == 'slack':
+            payload = format_slack_threat_message(
+                threat_message, severity, action, src_ip, dest_ip, category, is_test
+            )
+        elif webhook_type == 'discord':
+            payload = format_discord_threat_message(
+                threat_message, severity, action, src_ip, dest_ip, category, is_test
+            )
+        elif webhook_type == 'n8n':
+            payload = format_generic_threat_message(
+                threat_message, severity, action, src_ip, dest_ip, category, is_test
+            )
+        else:
+            logger.error(f"Unknown webhook type: {webhook_type}")
+            return False
+
+        # Send webhook
+        async with aiohttp.ClientSession() as session:
+            async with session.post(webhook_url, json=payload, timeout=10) as response:
+                if response.status in [200, 204]:
+                    logger.info(f"Threat webhook delivered successfully to {webhook_type}")
+                    return True
+                else:
+                    logger.error(f"Threat webhook delivery failed: {response.status} - {await response.text()}")
+                    return False
+
+    except Exception as e:
+        logger.error(f"Error delivering threat webhook: {e}", exc_info=True)
+        return False
+
+
+def get_severity_info(severity: int) -> tuple:
+    """Get severity label, emoji and color"""
+    if severity == 1:
+        return "High", "🔴", "#dc3545", 0xdc3545
+    elif severity == 2:
+        return "Medium", "🟠", "#fd7e14", 0xfd7e14
+    else:
+        return "Low", "🟡", "#ffc107", 0xffc107
+
+
+def format_slack_threat_message(
+    threat_message: str,
+    severity: int,
+    action: str,
+    src_ip: str,
+    dest_ip: Optional[str],
+    category: Optional[str],
+    is_test: bool
+) -> dict:
+    """Format a threat message for Slack webhook"""
+    severity_label, emoji, color, _ = get_severity_info(severity)
+    action_text = "Blocked" if action == "block" else "Detected"
+
+    title = f"{emoji} Threat {action_text}" + (" (TEST)" if is_test else "")
+
+    fields = [
+        {"title": "Threat", "value": threat_message, "short": False},
+        {"title": "Severity", "value": severity_label, "short": True},
+        {"title": "Action", "value": action_text, "short": True},
+        {"title": "Source IP", "value": src_ip, "short": True}
+    ]
+
+    if dest_ip:
+        fields.append({"title": "Destination IP", "value": dest_ip, "short": True})
+
+    if category:
+        fields.append({"title": "Category", "value": category, "short": True})
+
+    return {
+        "attachments": [
+            {
+                "color": color,
+                "title": title,
+                "fields": fields,
+                "footer": "Threat Watch | UI Toolkit",
+                "ts": int(datetime.now(timezone.utc).timestamp())
+            }
+        ]
+    }
+
+
+def format_discord_threat_message(
+    threat_message: str,
+    severity: int,
+    action: str,
+    src_ip: str,
+    dest_ip: Optional[str],
+    category: Optional[str],
+    is_test: bool
+) -> dict:
+    """Format a threat message for Discord webhook"""
+    severity_label, emoji, _, color = get_severity_info(severity)
+    action_text = "Blocked" if action == "block" else "Detected"
+
+    title = f"{emoji} Threat {action_text}" + (" (TEST)" if is_test else "")
+    description = f"**{threat_message}**"
+
+    fields = [
+        {"name": "Severity", "value": severity_label, "inline": True},
+        {"name": "Action", "value": action_text, "inline": True},
+        {"name": "Source IP", "value": src_ip, "inline": True}
+    ]
+
+    if dest_ip:
+        fields.append({"name": "Destination IP", "value": dest_ip, "inline": True})
+
+    if category:
+        fields.append({"name": "Category", "value": category, "inline": True})
+
+    return {
+        "embeds": [
+            {
+                "title": title,
+                "description": description,
+                "color": color,
+                "fields": fields,
+                "footer": {"text": "Threat Watch | UI Toolkit"},
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+        ]
+    }
+
+
+def format_generic_threat_message(
+    threat_message: str,
+    severity: int,
+    action: str,
+    src_ip: str,
+    dest_ip: Optional[str],
+    category: Optional[str],
+    is_test: bool
+) -> dict:
+    """Format a threat message for generic/n8n webhook"""
+    severity_labels = {1: "high", 2: "medium", 3: "low"}
+
+    return {
+        "event_type": "threat_detected",
+        "is_test": is_test,
+        "threat": {
+            "message": threat_message,
+            "severity": severity_labels.get(severity, "unknown"),
+            "severity_level": severity,
+            "action": action,
+            "category": category
+        },
+        "source_ip": src_ip,
+        "destination_ip": dest_ip,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "source": "unifi-toolkit"
+    }

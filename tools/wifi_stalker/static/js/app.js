@@ -26,6 +26,8 @@ function dashboard() {
         // WebSocket connection
         ws: null,
         wsConnected: false,
+        wsPingIntervalId: null,
+        autoRefreshIntervalId: null,
 
         // Modal visibility
         showAddDevice: false,
@@ -77,7 +79,11 @@ function dashboard() {
             this.connectWebSocket();
 
             // Auto-refresh every 60 seconds (backup to WebSocket)
-            setInterval(() => {
+            // Clear any existing interval first to prevent accumulation
+            if (this.autoRefreshIntervalId) {
+                clearInterval(this.autoRefreshIntervalId);
+            }
+            this.autoRefreshIntervalId = setInterval(() => {
                 this.loadDevices();
                 this.loadStatus();
             }, 60000);
@@ -122,6 +128,12 @@ function dashboard() {
                 console.log('WebSocket disconnected, reconnecting in 5 seconds...');
                 this.wsConnected = false;
 
+                // Clear the ping interval when disconnected
+                if (this.wsPingIntervalId) {
+                    clearInterval(this.wsPingIntervalId);
+                    this.wsPingIntervalId = null;
+                }
+
                 // Reconnect after 5 seconds
                 setTimeout(() => {
                     this.connectWebSocket();
@@ -129,7 +141,11 @@ function dashboard() {
             };
 
             // Send ping every 30 seconds to keep connection alive
-            setInterval(() => {
+            // Clear any existing interval first to prevent accumulation on reconnect
+            if (this.wsPingIntervalId) {
+                clearInterval(this.wsPingIntervalId);
+            }
+            this.wsPingIntervalId = setInterval(() => {
                 if (this.ws && this.ws.readyState === WebSocket.OPEN) {
                     this.ws.send('ping');
                 }

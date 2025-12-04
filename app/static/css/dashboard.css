@@ -232,6 +232,22 @@ body {
     color: var(--text-primary);
 }
 
+/* WAN IP obfuscation - click to reveal */
+.wan-ip-hidden {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.wan-ip-hidden:hover {
+    color: var(--accent-color);
+}
+
+.wan-ip-hidden[data-revealed="true"] {
+    cursor: default;
+    user-select: text;
+}
+
 .health-badge {
     padding: 0.125rem 0.5rem;
     border-radius: 4px;

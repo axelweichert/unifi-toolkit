@@ -120,11 +120,11 @@
                             </div>
                             <div class="detail-row">
                                 <span>WAN IP</span>
-                                <span id="wan-ip">--</span>
+                                <span id="wan-ip" class="wan-ip-hidden" title="Click to reveal" data-revealed="false">--</span>
                             </div>
                             <div class="detail-row" id="wan2-row" style="display: none;">
                                 <span>WAN2 IP</span>
-                                <span id="wan2-ip">--</span>
+                                <span id="wan2-ip" class="wan-ip-hidden" title="Click to reveal" data-revealed="false">--</span>
                             </div>
                             <div class="detail-row">
                                 <span>WAN Uptime</span>
@@ -541,6 +541,31 @@
                 statusExpandBtn.classList.toggle('expanded');
             });
 
+            // WAN IP click to reveal functionality
+            function setupWanIpToggle(elementId) {
+                const el = document.getElementById(elementId);
+                if (!el) return;
+
+                el.addEventListener('click', function() {
+                    const ip = this.dataset.ip;
+                    if (!ip || ip === '--') return;
+
+                    const isRevealed = this.dataset.revealed === 'true';
+                    if (isRevealed) {
+                        this.textContent = '•••.•••.•••.•••';
+                        this.dataset.revealed = 'false';
+                        this.title = 'Click to reveal';
+                    } else {
+                        this.textContent = ip;
+                        this.dataset.revealed = 'true';
+                        this.title = 'Click to hide';
+                    }
+                });
+            }
+
+            setupWanIpToggle('wan-ip');
+            setupWanIpToggle('wan2-ip');
+
             // Load system status
             async function loadSystemStatus() {
                 statusLoading.classList.add('visible');
@@ -586,7 +611,12 @@
                     document.getElementById('client-count-detail').textContent = system.client_count || '0';
                     document.getElementById('gateway-model-detail').textContent = system.gateway_model || 'Unknown';
                     document.getElementById('gateway-version').textContent = system.gateway_version || '--';
-                    document.getElementById('wan-ip').textContent = system.wan_ip || '--';
+                    // Store WAN IP and show obfuscated by default
+                    const wanIpEl = document.getElementById('wan-ip');
+                    const wanIp = system.wan_ip || '--';
+                    wanIpEl.dataset.ip = wanIp;
+                    wanIpEl.textContent = wanIp === '--' ? '--' : '•••.•••.•••.•••';
+                    wanIpEl.dataset.revealed = 'false';
 
                     // WAN availability from health stats
                     const wanAvail = health.wan?.availability;
@@ -596,7 +626,12 @@
                     if (health.wan2) {
                         document.getElementById('wan2-row').style.display = 'flex';
                         document.getElementById('wan2-availability-row').style.display = 'flex';
-                        document.getElementById('wan2-ip').textContent = health.wan2.wan_ip || '--';
+                        // Store WAN2 IP and show obfuscated by default
+                        const wan2IpEl = document.getElementById('wan2-ip');
+                        const wan2Ip = health.wan2.wan_ip || '--';
+                        wan2IpEl.dataset.ip = wan2Ip;
+                        wan2IpEl.textContent = wan2Ip === '--' ? '--' : '•••.•••.•••.•••';
+                        wan2IpEl.dataset.revealed = 'false';
                         const wan2Avail = health.wan2.availability;
                         document.getElementById('wan2-availability').textContent = wan2Avail ? `${wan2Avail.toFixed(2)}%` : '--';
                     } else {

@@ -23,10 +23,11 @@ class UniFiConfigCreate(BaseModel):
     """
     controller_url: str = Field(..., description="UniFi controller URL")
     username: str = Field(..., description="UniFi admin username")
-    password: Optional[str] = Field(None, description="Password for legacy controllers")
+    password: Optional[str] = Field(None, description="Password for legacy controllers or UniFi OS")
     api_key: Optional[str] = Field(None, description="API key for UniFi OS (UDM, UCG, etc.)")
     site_id: str = Field(default="default", description="UniFi site ID")
     verify_ssl: bool = Field(default=False, description="Verify SSL certificate")
+    is_unifi_os: bool = Field(default=False, description="Enable for UniFi OS devices (UDM, UDR, UCG, UX)")
 
 
 class UniFiConfigResponse(BaseModel):
@@ -39,6 +40,7 @@ class UniFiConfigResponse(BaseModel):
     has_api_key: bool
     site_id: str
     verify_ssl: bool
+    is_unifi_os: bool
     last_successful_connection: Optional[datetime] = None
 
 
@@ -107,6 +109,7 @@ async def save_unifi_config(
         existing_config.api_key_encrypted = encrypted_api_key
         existing_config.site_id = config.site_id
         existing_config.verify_ssl = config.verify_ssl
+        existing_config.is_unifi_os = config.is_unifi_os
     else:
         # Create new config
         new_config = UniFiConfig(
@@ -116,7 +119,8 @@ async def save_unifi_config(
             password_encrypted=encrypted_password,
             api_key_encrypted=encrypted_api_key,
             site_id=config.site_id,
-            verify_ssl=config.verify_ssl
+            verify_ssl=config.verify_ssl,
+            is_unifi_os=config.is_unifi_os
         )
         db.add(new_config)
 
@@ -152,6 +156,7 @@ async def get_unifi_config(
         has_api_key=config.api_key_encrypted is not None,
         site_id=config.site_id,
         verify_ssl=config.verify_ssl,
+        is_unifi_os=config.is_unifi_os,
         last_successful_connection=config.last_successful_connection
     )
 
@@ -176,7 +181,8 @@ async def test_unifi_credentials(config: UniFiConfigCreate):
         password=config.password,
         api_key=config.api_key,
         site=config.site_id,
-        verify_ssl=config.verify_ssl
+        verify_ssl=config.verify_ssl,
+        is_unifi_os=config.is_unifi_os if not config.api_key else None  # Auto-detect if API key provided
     )
 
     test_result = await client.test_connection()
@@ -222,7 +228,8 @@ async def test_saved_unifi_connection(
         password=password,
         api_key=api_key,
         site=config.site_id,
-        verify_ssl=config.verify_ssl
+        verify_ssl=config.verify_ssl,
+        is_unifi_os=config.is_unifi_os if not api_key else None  # Auto-detect if API key provided
     )
 
     test_result = await client.test_connection()
@@ -277,7 +284,8 @@ async def check_gateway_availability(
         password=password,
         api_key=api_key,
         site=config.site_id,
-        verify_ssl=config.verify_ssl
+        verify_ssl=config.verify_ssl,
+        is_unifi_os=config.is_unifi_os if not api_key else None  # Auto-detect if API key provided
     )
 
     try:

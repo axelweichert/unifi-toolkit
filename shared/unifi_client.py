@@ -111,7 +111,7 @@ def get_friendly_model_name(model_code: str) -> str:
 class UniFiClient:
     """
     Wrapper around aiounifi for interacting with UniFi controller
-    Supports both legacy (username/password) and UniFi OS (API key) authentication
+    Supports both legacy (username/password) and UniFi OS (API key or username/password) authentication
     """
 
     def __init__(
@@ -121,20 +121,23 @@ class UniFiClient:
         password: str = None,
         api_key: str = None,
         site: str = "default",
-        verify_ssl: bool = False
+        verify_ssl: bool = False,
+        is_unifi_os: bool = None
     ):
         """
         Initialize UniFi client
 
         Args:
             host: UniFi controller URL (e.g., https://192.168.1.1:8443)
-            username: UniFi username (legacy auth)
-            password: UniFi password (legacy auth)
+            username: UniFi username (legacy auth or UniFi OS auth)
+            password: UniFi password (legacy auth or UniFi OS auth)
             api_key: UniFi API key (UniFi OS auth)
             site: UniFi site ID (default: "default")
             verify_ssl: Whether to verify SSL certificates
+            is_unifi_os: Force UniFi OS mode (True for UDM/UDR/UCG/UX devices)
+                         If None, auto-detects based on API key presence
         """
-        self.host = host
+        self.host = host.rstrip('/')  # Remove trailing slash if present
         self.username = username
         self.password = password
         self.api_key = api_key
@@ -142,7 +145,11 @@ class UniFiClient:
         self.verify_ssl = verify_ssl
         self.controller: Optional[Controller] = None
         self._session: Optional[aiohttp.ClientSession] = None
-        self.is_unifi_os = api_key is not None  # UniFi OS if using API key
+        # UniFi OS mode: explicit setting, or auto-detect if API key present
+        if is_unifi_os is not None:
+            self.is_unifi_os = is_unifi_os
+        else:
+            self.is_unifi_os = api_key is not None
 
     async def connect(self) -> bool:
         """
@@ -162,26 +169,65 @@ class UniFiClient:
             # Create aiohttp session
             connector = aiohttp.TCPConnector(ssl=ssl_context)
 
-            # Add API key header if using UniFi OS
+            # Add API key header if using UniFi OS with API key
             headers = {}
             if self.api_key:
                 headers['X-API-KEY'] = self.api_key
 
+            # Use cookie_jar to persist session cookies for UniFi OS login
             self._session = aiohttp.ClientSession(
                 connector=connector,
-                headers=headers
+                headers=headers,
+                cookie_jar=aiohttp.CookieJar(unsafe=True)
             )
 
             if self.is_unifi_os:
-                # UniFi OS - test connection with API key
-                test_url = f"{self.host}/proxy/network/api/s/{self.site}/stat/device"
-                async with self._session.get(test_url) as resp:
-                    if resp.status != 200:
-                        logger.error(f"UniFi OS API connection failed: {resp.status}")
-                        await self.disconnect()
-                        return False
-                logger.info(f"Successfully connected to UniFi OS at {self.host}")
-                return True
+                if self.api_key:
+                    # UniFi OS with API key - test connection
+                    test_url = f"{self.host}/proxy/network/api/s/{self.site}/stat/device"
+                    async with self._session.get(test_url) as resp:
+                        if resp.status != 200:
+                            logger.error(f"UniFi OS API key connection failed: {resp.status}")
+                            await self.disconnect()
+                            return False
+                    logger.info(f"Successfully connected to UniFi OS (API key) at {self.host}")
+                    return True
+                else:
+                    # UniFi OS with username/password - login via /api/auth/login
+                    login_url = f"{self.host}/api/auth/login"
+                    login_payload = {
+                        "username": self.username,
+                        "password": self.password,
+                        "remember": True
+                    }
+
+                    async with self._session.post(login_url, json=login_payload) as resp:
+                        if resp.status != 200:
+                            # Try to get error message
+                            try:
+                                error_data = await resp.json()
+                                error_msg = error_data.get('errors', [error_data.get('message', 'Unknown error')])
+                                logger.error(f"UniFi OS login failed: {resp.status} - {error_msg}")
+                            except:
+                                logger.error(f"UniFi OS login failed: {resp.status}")
+                            await self.disconnect()
+                            return False
+
+                        # Get CSRF token from response headers or cookies for future requests
+                        csrf_token = resp.headers.get('X-CSRF-Token')
+                        if csrf_token:
+                            self._session.headers.update({'X-CSRF-Token': csrf_token})
+
+                    # Test the connection by getting devices
+                    test_url = f"{self.host}/proxy/network/api/s/{self.site}/stat/device"
+                    async with self._session.get(test_url) as resp:
+                        if resp.status != 200:
+                            logger.error(f"UniFi OS API test failed after login: {resp.status}")
+                            await self.disconnect()
+                            return False
+
+                    logger.info(f"Successfully connected to UniFi OS (username/password) at {self.host}")
+                    return True
             else:
                 # Legacy - use aiounifi Controller with Configuration object
                 # Parse host and port from URL

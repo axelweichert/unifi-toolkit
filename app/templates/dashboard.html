@@ -228,8 +228,9 @@
                         <div class="auth-info-box">
                             <strong>Authentication Method:</strong>
                             <p>
-                                🔐 <strong>UniFi OS (UCG, UDM):</strong> Use API Key<br>
-                                🔑 <strong>Legacy Controllers:</strong> Use Username & Password
+                                🔐 <strong>UniFi OS with API Key:</strong> UCG, UDM, UDR (newer firmware)<br>
+                                🔑 <strong>UniFi OS with Username/Password:</strong> UX, older UDM/UCG without API support<br>
+                                🔑 <strong>Legacy Controllers:</strong> Cloud Key, Self-hosted
                             </p>
                         </div>
 
@@ -268,6 +269,16 @@
                                    name="site_id"
                                    value="default">
                             <small>Usually "default" for single-site setups</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox"
+                                       id="is_unifi_os"
+                                       name="is_unifi_os">
+                                UniFi OS Device (UDM, UDR, UCG, UX)
+                            </label>
+                            <small>Check this for built-in consoles using username/password (not API key)</small>
                         </div>
 
                         <div class="form-group">
@@ -729,6 +740,7 @@
                         document.getElementById('controller_url').value = config.controller_url || '';
                         document.getElementById('username').value = config.username || 'admin';
                         document.getElementById('site_id').value = config.site_id || 'default';
+                        document.getElementById('is_unifi_os').checked = config.is_unifi_os || false;
                         document.getElementById('verify_ssl').checked = config.verify_ssl || false;
                     }
                 } catch (error) {
@@ -747,6 +759,7 @@
                     password: formData.get('password') || null,
                     api_key: formData.get('api_key') || null,
                     site_id: formData.get('site_id') || 'default',
+                    is_unifi_os: formData.get('is_unifi_os') === 'on',
                     verify_ssl: formData.get('verify_ssl') === 'on'
                 };
 
@@ -819,6 +832,7 @@
                     password: formData.get('password') || null,
                     api_key: formData.get('api_key') || null,
                     site_id: formData.get('site_id') || 'default',
+                    is_unifi_os: formData.get('is_unifi_os') === 'on',
                     verify_ssl: formData.get('verify_ssl') === 'on'
                 };
 

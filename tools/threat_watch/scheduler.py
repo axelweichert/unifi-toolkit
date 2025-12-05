@@ -225,7 +225,8 @@ async def refresh_threat_events():
                 password=password,
                 api_key=api_key,
                 site=unifi_config.site_id,
-                verify_ssl=unifi_config.verify_ssl
+                verify_ssl=unifi_config.verify_ssl,
+                is_unifi_os=unifi_config.is_unifi_os if not api_key else None
             )
 
             # Connect to UniFi controller

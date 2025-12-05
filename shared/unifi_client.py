@@ -730,8 +730,8 @@ class UniFiClient:
                         elif device_type == 'usw':
                             result['switch_count'] += 1
 
-                        # Find gateway (UDM, USG, UCG, UXG)
-                        if device_type in ('ugw', 'udm', 'uxg'):
+                        # Find gateway (UDM, USG, UCG, UXG, UX)
+                        if device_type in ('ugw', 'udm', 'uxg', 'ux'):
                             model_code = device.get('model', 'Unknown')
                             result['gateway_model'] = get_friendly_model_name(model_code)
                             result['gateway_name'] = device.get('name', result['gateway_model'])
@@ -934,13 +934,14 @@ class UniFiClient:
                     devices = data.get('data', [])
 
                     # Check for gateway device types
+                    # ux = UniFi Express, ugw = USG, udm = Dream Machine, uxg = UXG series
                     for device in devices:
                         device_type = device.get('type', '')
-                        if device_type in ('ugw', 'udm', 'uxg'):
-                            logger.info(f"Found gateway: {device.get('model', 'Unknown')}")
+                        if device_type in ('ugw', 'udm', 'uxg', 'ux'):
+                            logger.info(f"Found gateway: {device.get('model', 'Unknown')} (type: {device_type})")
                             return True
 
-                    logger.info("No gateway device found")
+                    logger.info("No gateway device found in devices list")
                     return False
                 else:
                     logger.error(f"Failed to get devices: {resp.status}")
@@ -983,9 +984,10 @@ class UniFiClient:
                     devices = data.get('data', [])
 
                     # Look for gateway device types
+                    # ux = UniFi Express, ugw = USG, udm = Dream Machine, uxg = UXG series
                     for device in devices:
                         device_type = device.get('type', '')
-                        if device_type in ('ugw', 'udm', 'uxg'):
+                        if device_type in ('ugw', 'udm', 'uxg', 'ux'):
                             model_code = device.get('model', '').upper()
                             result["has_gateway"] = True
                             result["gateway_model"] = model_code
@@ -993,12 +995,12 @@ class UniFiClient:
                             result["supports_ids_ips"] = model_code in IDS_IPS_SUPPORTED_MODELS
 
                             logger.info(
-                                f"Found gateway: {result['gateway_name']} ({model_code}), "
+                                f"Found gateway: {result['gateway_name']} ({model_code}, type: {device_type}), "
                                 f"IDS/IPS: {result['supports_ids_ips']}"
                             )
                             return result
 
-                    logger.info("No gateway device found")
+                    logger.info("No gateway device found in devices list")
                 else:
                     logger.error(f"Failed to get devices: {resp.status}")
 

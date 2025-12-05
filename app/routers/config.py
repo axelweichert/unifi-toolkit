@@ -68,6 +68,8 @@ class GatewayCheckResponse(BaseModel):
     Response model for gateway availability check
     """
     has_gateway: bool
+    supports_ids_ips: bool = False
+    gateway_name: Optional[str] = None
     configured: bool
     error: Optional[str] = None
 
@@ -294,20 +296,24 @@ async def check_gateway_availability(
         if not connected:
             return GatewayCheckResponse(
                 has_gateway=False,
+                supports_ids_ips=False,
                 configured=True,
                 error="Failed to connect to UniFi controller"
             )
 
-        # Check for gateway
-        has_gateway = await client.has_gateway()
+        # Get gateway info including IDS/IPS support
+        gateway_info = await client.get_gateway_info()
         return GatewayCheckResponse(
-            has_gateway=has_gateway,
+            has_gateway=gateway_info.get("has_gateway", False),
+            supports_ids_ips=gateway_info.get("supports_ids_ips", False),
+            gateway_name=gateway_info.get("gateway_name"),
             configured=True
         )
 
     except Exception as e:
         return GatewayCheckResponse(
             has_gateway=False,
+            supports_ids_ips=False,
             configured=True,
             error=str(e)
         )

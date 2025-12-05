@@ -927,8 +927,16 @@
                         threatWatchBtn.style.pointerEvents = 'none';
                         threatWatchStatus.style.display = 'block';
                         threatWatchStatus.innerHTML = '⚠️ <strong>Threat Watch requires a UniFi Gateway.</strong><br>Your site has no gateway device (UDM, UCG, UXG, or USG). IDS/IPS features are only available on gateway devices.';
+                    } else if (!data.supports_ids_ips) {
+                        // Gateway found but doesn't support IDS/IPS (e.g., UniFi Express)
+                        const gatewayName = data.gateway_name || 'your gateway';
+                        threatWatchCard.classList.add('tool-unavailable');
+                        threatWatchBtn.classList.add('disabled');
+                        threatWatchBtn.style.pointerEvents = 'none';
+                        threatWatchStatus.style.display = 'block';
+                        threatWatchStatus.innerHTML = `⚠️ <strong>IDS/IPS not available on ${gatewayName}.</strong><br>This gateway model does not include IDS/IPS capabilities. IDS/IPS is available on UDM, UCG, UXG, and USG series gateways.`;
                     } else {
-                        // Gateway found - Threat Watch available
+                        // Gateway with IDS/IPS found - Threat Watch available
                         threatWatchCard.classList.remove('tool-unavailable');
                         threatWatchBtn.classList.remove('disabled');
                         threatWatchBtn.style.pointerEvents = 'auto';

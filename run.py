@@ -59,6 +59,9 @@ if not encryption_key:
 if __name__ == "__main__":
     import uvicorn
     from shared.config import get_settings
+    from app import __version__ as app_version
+    from tools.wifi_stalker import __version__ as stalker_version
+    from tools.threat_watch import __version__ as threat_watch_version
 
     settings = get_settings()
 
@@ -66,7 +69,7 @@ if __name__ == "__main__":
     print("Starting UI Toolkit...")
     print("=" * 70)
     print()
-    print(f"Version: 1.3.0")
+    print(f"Version: {app_version}")
     print(f"Log Level: {settings.log_level}")
     print(f"Database: {settings.database_url}")
     print()
@@ -82,8 +85,8 @@ if __name__ == "__main__":
     print()
 
     print("Available tools:")
-    print("  - Wi-Fi Stalker v0.7.0")
-    print("  - Threat Watch v0.1.0")
+    print(f"  - Wi-Fi Stalker v{stalker_version}")
+    print(f"  - Threat Watch v{threat_watch_version}")
     print()
 
     if deployment_type == "PRODUCTION":

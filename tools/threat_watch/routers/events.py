@@ -1,6 +1,7 @@
 """
 API routes for threat events
 """
+import logging
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc, and_, or_
@@ -9,6 +10,8 @@ from typing import Optional
 
 from shared.database import get_db_session
 from tools.threat_watch.database import ThreatEvent
+
+logger = logging.getLogger(__name__)
 from tools.threat_watch.models import (
     ThreatEventResponse,
     ThreatEventDetail,
@@ -343,3 +346,126 @@ async def get_events_by_ip(
         page_size=page_size,
         has_more=has_more
     )
+
+
+@router.get("/debug/test-fetch")
+async def debug_test_fetch(
+    db: AsyncSession = Depends(get_db_session)
+):
+    """
+    Debug endpoint to test IPS event fetching from UniFi.
+
+    This endpoint connects to UniFi, attempts to fetch IPS events,
+    and returns diagnostic information about the response.
+    """
+    from shared.models.unifi_config import UniFiConfig
+    from shared.unifi_client import UniFiClient
+    from shared.crypto import decrypt_password, decrypt_api_key
+    import time
+
+    # Get UniFi config
+    result = await db.execute(select(UniFiConfig).where(UniFiConfig.id == 1))
+    unifi_config = result.scalar_one_or_none()
+
+    if not unifi_config:
+        return {
+            "success": False,
+            "error": "No UniFi configuration found",
+            "hint": "Configure UniFi controller in dashboard settings"
+        }
+
+    # Decrypt credentials
+    password = None
+    api_key = None
+    try:
+        if unifi_config.password_encrypted:
+            password = decrypt_password(unifi_config.password_encrypted)
+        if unifi_config.api_key_encrypted:
+            api_key = decrypt_api_key(unifi_config.api_key_encrypted)
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"Failed to decrypt credentials: {str(e)}"
+        }
+
+    # Create client
+    client = UniFiClient(
+        host=unifi_config.controller_url,
+        username=unifi_config.username,
+        password=password,
+        api_key=api_key,
+        site=unifi_config.site_id,
+        verify_ssl=unifi_config.verify_ssl
+    )
+
+    try:
+        # Connect
+        connected = await client.connect()
+        if not connected:
+            return {
+                "success": False,
+                "error": "Failed to connect to UniFi controller",
+                "controller_url": unifi_config.controller_url,
+                "site": unifi_config.site_id
+            }
+
+        # Get gateway info
+        gateway_info = await client.get_gateway_info()
+        ips_settings = await client.get_ips_settings()
+
+        # Calculate time range (last 24 hours)
+        now_ms = int(time.time() * 1000)
+        day_ago_ms = now_ms - (24 * 60 * 60 * 1000)
+
+        # Fetch events
+        events = await client.get_ips_events(start=day_ago_ms, end=now_ms)
+
+        # Build diagnostic response
+        response = {
+            "success": True,
+            "connection": {
+                "controller_url": unifi_config.controller_url,
+                "site": unifi_config.site_id,
+                "is_unifi_os": client.is_unifi_os,
+                "detected_type": client._detected_type
+            },
+            "gateway": gateway_info,
+            "ips_settings": ips_settings,
+            "events_fetch": {
+                "time_range_ms": {
+                    "start": day_ago_ms,
+                    "end": now_ms
+                },
+                "events_returned": len(events),
+                "sample_event_keys": list(events[0].keys()) if events else None,
+                "sample_event": events[0] if events else None
+            }
+        }
+
+        # Check for common issues
+        issues = []
+        if not gateway_info.get("has_gateway"):
+            issues.append("No gateway device found")
+        if not gateway_info.get("supports_ids_ips"):
+            issues.append(f"Gateway ({gateway_info.get('gateway_name')}) does not support IDS/IPS")
+        if ips_settings and not ips_settings.get("ips_enabled"):
+            issues.append(f"IDS/IPS is disabled (mode: {ips_settings.get('ips_mode')})")
+        if not client.is_unifi_os:
+            issues.append("Legacy controller detected - IPS API may not be available")
+        if len(events) == 0:
+            issues.append("No events returned - this may be normal if no threats have been detected in the last 24 hours")
+
+        if issues:
+            response["issues"] = issues
+
+        return response
+
+    except Exception as e:
+        logger.exception("Debug test fetch failed")
+        return {
+            "success": False,
+            "error": str(e),
+            "error_type": type(e).__name__
+        }
+    finally:
+        await client.disconnect()

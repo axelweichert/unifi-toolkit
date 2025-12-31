@@ -884,14 +884,31 @@ class UniFiClient:
             else:
                 url = f"{self.host}/api/s/{self.site}/stat/ips/event"
 
+            logger.debug(f"Fetching IPS events from: {url}")
+            logger.debug(f"IPS events payload: {payload}")
+
             async with self._session.post(url, json=payload) as resp:
                 if resp.status != 200:
-                    logger.error(f"Failed to get IPS events: {resp.status}")
+                    resp_text = await resp.text()
+                    logger.error(f"Failed to get IPS events: HTTP {resp.status}")
+                    logger.debug(f"IPS events error response: {resp_text[:500] if resp_text else 'empty'}")
                     return []
 
                 data = await resp.json()
                 events = data.get('data', [])
+
+                # Log response metadata for debugging
+                meta = data.get('meta', {})
+                if meta:
+                    logger.debug(f"IPS events response meta: {meta}")
+
                 logger.info(f"Retrieved {len(events)} IPS events from UniFi")
+
+                # Log sample event structure if DEBUG and events exist
+                if events and logger.isEnabledFor(logging.DEBUG):
+                    sample_keys = list(events[0].keys()) if events else []
+                    logger.debug(f"IPS event sample keys: {sample_keys[:15]}...")
+
                 return events
 
         except Exception as e:

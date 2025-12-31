@@ -252,8 +252,13 @@ async def refresh_threat_events():
                     start_ms = int((datetime.now(timezone.utc) - timedelta(days=1)).timestamp() * 1000)
 
                 # Fetch events from UniFi
+                logger.debug(f"Fetching IPS events starting from timestamp: {start_ms}")
                 raw_events = await unifi_client.get_ips_events(start=start_ms)
                 logger.info(f"Retrieved {len(raw_events)} IPS events from UniFi")
+
+                # Log if no events returned for debugging
+                if not raw_events:
+                    logger.debug("No IPS events returned from UniFi API - this may be normal if no threats detected")
 
                 # Process and store new events
                 new_count = 0

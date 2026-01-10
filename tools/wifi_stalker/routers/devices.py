@@ -757,11 +757,13 @@ async def get_presence_pattern(
     )
     presence_records = result.scalars().all()
 
-    # Calculate days of data based on max sample_count
-    max_samples = max((p.sample_count for p in presence_records), default=0)
-    days_of_data = max_samples // 24 if max_samples >= 24 else (
-        1 if max_samples > 0 else 0
-    )
+    # Calculate days of data based on device added_at timestamp
+    now = datetime.now(timezone.utc)
+    # Ensure added_at is timezone-aware for comparison
+    added_at = device.added_at
+    if added_at.tzinfo is None:
+        added_at = added_at.replace(tzinfo=timezone.utc)
+    days_of_data = (now - added_at).days
 
     # Build 24x7 matrix (hours as rows, days as columns)
     # Initialize with zeros

@@ -2,6 +2,15 @@
 
 All notable changes to UI Toolkit will be documented in this file.
 
+## [1.8.2] - 2025-01-10
+
+### Wi-Fi Stalker v0.11.1
+
+#### Fixed
+- **Presence Pattern days calculation** - Fixed incorrect "days of data" display in Presence Pattern analytics. Previously showed "1 day(s)" even after 10+ days of tracking because it was incorrectly calculating from sample counts instead of the device's actual tracking start date.
+
+---
+
 ## [1.8.0] - 2025-12-23
 
 ### Testing Infrastructure

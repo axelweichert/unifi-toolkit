@@ -908,7 +908,8 @@ class UniFiClient:
             # Protocol info
             'proto': event.get('protocol'),
             'app_proto': event.get('service'),
-            'in_iface': event.get('in'),
+            # v2 API returns 'in' as an object with network_id/network_name
+            'in_iface': event.get('in', {}).get('network_name') if isinstance(event.get('in'), dict) else event.get('in'),
 
             # Geo info (if available in v2 format)
             'src_ip_country': source.get('country'),

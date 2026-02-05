@@ -677,6 +677,25 @@ code {
     border-color: var(--primary-color);
 }
 
+.external-link.link-disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: default;
+}
+
+.external-link.link-disabled:hover {
+    background: var(--background);
+    color: var(--primary-color);
+    border-color: var(--border-color);
+}
+
+.private-ip-notice {
+    width: 100%;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
 /* Top Attackers List */
 .attackers-list {
     display: flex;

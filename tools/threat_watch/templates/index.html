@@ -496,16 +496,30 @@
 
                     <!-- External Lookup Links -->
                     <div x-show="eventDetails?.src_ip" class="external-links">
+                        <template x-if="isPrivateIP(eventDetails?.src_ip)">
+                            <div class="private-ip-notice">
+                                ℹ️ External lookups are not available for private (RFC1918) IP addresses.
+                            </div>
+                        </template>
                         <a :href="'https://www.abuseipdb.com/check/' + eventDetails?.src_ip"
-                           target="_blank" class="external-link">
+                           target="_blank" class="external-link"
+                           :class="{ 'link-disabled': isPrivateIP(eventDetails?.src_ip) }"
+                           @click.prevent="isPrivateIP(eventDetails?.src_ip) && $event.preventDefault()"
+                           :aria-disabled="isPrivateIP(eventDetails?.src_ip)">
                             🔍 AbuseIPDB
                         </a>
                         <a :href="'https://www.virustotal.com/gui/ip-address/' + eventDetails?.src_ip"
-                           target="_blank" class="external-link">
+                           target="_blank" class="external-link"
+                           :class="{ 'link-disabled': isPrivateIP(eventDetails?.src_ip) }"
+                           @click.prevent="isPrivateIP(eventDetails?.src_ip) && $event.preventDefault()"
+                           :aria-disabled="isPrivateIP(eventDetails?.src_ip)">
                             🦠 VirusTotal
                         </a>
                         <a :href="'https://www.shodan.io/host/' + eventDetails?.src_ip"
-                           target="_blank" class="external-link">
+                           target="_blank" class="external-link"
+                           :class="{ 'link-disabled': isPrivateIP(eventDetails?.src_ip) }"
+                           @click.prevent="isPrivateIP(eventDetails?.src_ip) && $event.preventDefault()"
+                           :aria-disabled="isPrivateIP(eventDetails?.src_ip)">
                             🔎 Shodan
                         </a>
                     </div>

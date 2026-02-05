@@ -98,6 +98,54 @@ def run_migrations():
             print(f"Migration warning: {e}")
             print("The application will continue, but some features may not work correctly.")
 
+    # Always run schema repair after migrations to catch cases where
+    # stamping to head skipped actual column additions
+    _repair_schema()
+
+
+def _repair_schema():
+    """
+    Check for and add missing columns that migrations may have skipped.
+
+    This handles the case where init_db's create_all creates new tables,
+    causing alembic to fail with 'already exists' and stamp to head,
+    skipping ADD COLUMN operations on existing tables.
+    """
+    import sqlite3
+    from pathlib import Path
+
+    db_path = Path("./data/unifi_toolkit.db")
+    if not db_path.exists():
+        return  # No database yet, nothing to repair
+
+    try:
+        conn = sqlite3.connect(str(db_path))
+        cursor = conn.cursor()
+
+        # Get existing columns for threats_events
+        cursor.execute("PRAGMA table_info(threats_events)")
+        existing_columns = {row[1] for row in cursor.fetchall()}
+
+        if not existing_columns:
+            conn.close()
+            return  # Table doesn't exist yet
+
+        # Check for missing columns and add them
+        missing_columns = {
+            'ignored': "ALTER TABLE threats_events ADD COLUMN ignored BOOLEAN NOT NULL DEFAULT 0",
+            'ignored_by_rule_id': "ALTER TABLE threats_events ADD COLUMN ignored_by_rule_id INTEGER",
+        }
+
+        for col_name, sql in missing_columns.items():
+            if col_name not in existing_columns:
+                print(f"Schema repair: adding missing column '{col_name}' to threats_events")
+                cursor.execute(sql)
+
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"Schema repair warning: {e}")
+
 
 # Start the application
 if __name__ == "__main__":

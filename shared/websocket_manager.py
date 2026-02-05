@@ -56,6 +56,27 @@ class WebSocketManager:
         for connection in disconnected:
             self.disconnect(connection)
 
+    async def broadcast(self, data: dict):
+        """
+        Broadcast arbitrary data to all connected clients
+
+        Args:
+            data: Dictionary to send as JSON
+        """
+        if not self.active_connections:
+            return
+
+        disconnected = []
+        for connection in self.active_connections:
+            try:
+                await connection.send_json(data)
+            except Exception as e:
+                logger.error(f"Error sending to WebSocket: {e}")
+                disconnected.append(connection)
+
+        for connection in disconnected:
+            self.disconnect(connection)
+
     async def broadcast_status_update(self, status_data: dict):
         """
         Broadcast system status update to all connected clients

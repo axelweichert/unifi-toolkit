@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy requirements
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir --user -r requirements.txt
+# Install Python dependencies to a known prefix
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 # Stage 2: Runtime stage
 FROM python:3.12-slim
@@ -33,14 +33,11 @@ RUN useradd -m -u 1000 toolkit && \
     mkdir -p /app/data && \
     chown -R toolkit:toolkit /app
 
-# Copy Python dependencies from builder
-COPY --from=builder /root/.local /home/toolkit/.local
+# Copy Python dependencies from builder into system path
+COPY --from=builder /install /usr/local
 
 # Copy application code
 COPY --chown=toolkit:toolkit . .
-
-# Set PATH to include user site-packages
-ENV PATH=/home/toolkit/.local/bin:$PATH
 
 # Switch to non-root user
 USER toolkit

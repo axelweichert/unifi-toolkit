@@ -2,6 +2,13 @@
 
 All notable changes to UI Toolkit will be documented in this file.
 
+## [1.9.5] - 2026-02-13
+
+### Fixed
+- **Docker: python-dotenv not found on some platforms** - The multi-stage Docker build installed Python packages to user site-packages (`~/.local`), which depends on Python's `site` module resolving the correct path at runtime. On some platforms (notably Synology), this lookup failed, causing `python-dotenv` to not be found even though it was installed. Packages are now installed to `/usr/local` (system site-packages) which is always on Python's path. (#39)
+
+---
+
 ## [1.9.4] - 2026-02-13
 
 ### Fixed

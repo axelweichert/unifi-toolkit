@@ -93,6 +93,13 @@ body {
     width: auto;
 }
 
+/* Theme-aware Logo */
+.header-logo-dark { display: none; }
+.header-logo-light { display: block; }
+
+[data-theme="dark"] .header-logo-dark { display: block; }
+[data-theme="dark"] .header-logo-light { display: none; }
+
 .header h1 {
     font-size: 1.75rem;
     margin: 0;

@@ -338,13 +338,13 @@ pytest tests/ --cov=shared --cov=app -v
 
 If you find UI Toolkit useful, consider supporting development:
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://www.vonbusch.de)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://www.vonbusch.digital)
 
 ---
 
 ## Credits
 
-Developed by [vonBusch GmbH](https://www.vonbusch.de/)
+Developed by [vonBusch GmbH](https://www.vonbusch.digital/)
 
 - YouTube: [@vonBusch](https://www.youtube.com/@vonBusch)
 

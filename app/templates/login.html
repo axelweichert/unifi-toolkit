@@ -90,6 +90,12 @@
             height: auto;
         }
 
+        /* Theme-aware Logo */
+        .logo-dark { display: none; }
+        .logo-light { display: block; margin: 0 auto; }
+        :root[data-theme="dark"] .logo-dark { display: block; margin: 0 auto; }
+        :root[data-theme="dark"] .logo-light { display: none; }
+
         .title {
             text-align: center;
             margin-bottom: 0.5rem;
@@ -296,7 +302,8 @@
     <div class="login-container">
         <div class="login-card">
             <div class="logo">
-                <img src="/static/images/vonbusch-logo.png" alt="vonBusch GmbH">
+                <img src="/static/images/vonbusch-logo.png" alt="vonBusch GmbH" class="logo-light">
+                <img src="/static/images/vonbusch-logo-white.png" alt="vonBusch GmbH" class="logo-dark">
             </div>
 
             <div class="title">

@@ -1,11 +1,10 @@
 services:
   unifi-toolkit:
-    # Use pre-built image from GitHub Container Registry (recommended)
-    image: ghcr.io/axelweichert/unifi-toolkit:latest
-    # Or build locally by uncommenting below and commenting out 'image' above:
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
+    # Build locally from source
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # image: ghcr.io/axelweichert/unifi-toolkit:latest
     container_name: unifi-toolkit
     restart: unless-stopped
     environment:

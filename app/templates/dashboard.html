@@ -19,9 +19,9 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <div class="header-left">
-                    <img src="/static/images/vonbusch-logo.png" alt="vonBusch GmbH" class="header-logo header-logo-light">
-                    <img src="/static/images/vonbusch-logo-white.png" alt="vonBusch GmbH" class="header-logo header-logo-dark">
+                <div class="header-left"><img src="/static/images/vonbusch-logo.svg" class="logo-light" style="max-height:40px;width:auto;"><img src="/static/images/vonbusch-logo-white.svg" class="logo-dark" style="max-height:40px;width:auto;display:none;">
+                    
+                    
                 </div>
                 <div class="header-center">
                     <h1>UI Toolkit</h1>
@@ -468,6 +468,7 @@
             const themeLabel = document.getElementById('theme-label');
 
             function updateThemeUI(theme) {
+                if (theme === "dark") { document.querySelector(".logo-dark").style.display="block"; document.querySelector(".logo-light").style.display="none"; } else { document.querySelector(".logo-dark").style.display="none"; document.querySelector(".logo-light").style.display="block"; }
                 if (theme === 'dark') {
                     themeIcon.textContent = '☀️';
                     themeLabel.textContent = 'Dark';

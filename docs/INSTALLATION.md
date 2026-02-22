@@ -3,7 +3,7 @@
 Complete installation instructions for Ubuntu Server (22.04 LTS or 24.04 LTS).
 
 > **Synology NAS users:** See [SYNOLOGY.md](SYNOLOGY.md) for Container Manager instructions.
-> **QNAP NAS users:** See the [community QNAP deployment guide](https://github.com/Crosstalk-Solutions/unifi-toolkit/issues/29) for Container Station instructions.
+> **QNAP NAS users:** See the [community QNAP deployment guide](https://github.com/axelweichert/unifi-toolkit/issues/29) for Container Station instructions.
 
 ## Table of Contents
 
@@ -109,7 +109,7 @@ sudo mkdir -p /opt/unifi-toolkit
 sudo chown $USER:$USER /opt/unifi-toolkit
 
 # Clone the repository
-git clone https://github.com/Crosstalk-Solutions/unifi-toolkit.git /opt/unifi-toolkit
+git clone https://github.com/axelweichert/unifi-toolkit.git /opt/unifi-toolkit
 
 # Navigate into the directory
 cd /opt/unifi-toolkit
@@ -679,8 +679,8 @@ When managing multiple UniFi sites:
 
 ## Getting Help
 
-- **Community**: [#unifi-toolkit on Discord](https://discord.com/invite/crosstalksolutions)
-- **GitHub Issues**: [Report a bug or request a feature](https://github.com/Crosstalk-Solutions/unifi-toolkit/issues)
+- **Community**: [#unifi-toolkit on Discord](https://github.com/axelweichert/unifi-toolkit/issues)
+- **GitHub Issues**: [Report a bug or request a feature](https://github.com/axelweichert/unifi-toolkit/issues)
 - **Documentation**: Check the `docs/` directory for additional guides
 
 ---
@@ -690,7 +690,7 @@ When managing multiple UniFi sites:
 ### Local Deployment
 ```bash
 sudo mkdir -p /opt/unifi-toolkit && sudo chown $USER:$USER /opt/unifi-toolkit
-git clone https://github.com/Crosstalk-Solutions/unifi-toolkit.git /opt/unifi-toolkit
+git clone https://github.com/axelweichert/unifi-toolkit.git /opt/unifi-toolkit
 cd /opt/unifi-toolkit
 ./setup.sh  # Select 1 for Local
 docker compose up -d
@@ -700,7 +700,7 @@ docker compose up -d
 ### Production Deployment
 ```bash
 sudo mkdir -p /opt/unifi-toolkit && sudo chown $USER:$USER /opt/unifi-toolkit
-git clone https://github.com/Crosstalk-Solutions/unifi-toolkit.git /opt/unifi-toolkit
+git clone https://github.com/axelweichert/unifi-toolkit.git /opt/unifi-toolkit
 cd /opt/unifi-toolkit
 ./setup.sh  # Select 2 for Production
 sudo ufw allow 80/tcp && sudo ufw allow 443/tcp

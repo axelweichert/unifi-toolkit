@@ -12,7 +12,7 @@ Get up and running in 5 minutes.
 
 ```bash
 # Clone and setup
-git clone https://github.com/Crosstalk-Solutions/unifi-toolkit.git
+git clone https://github.com/axelweichert/unifi-toolkit.git
 cd unifi-toolkit
 ./setup.sh  # Select 1 for Local
 
@@ -26,7 +26,7 @@ docker compose up -d
 
 ```bash
 # Clone and setup
-git clone https://github.com/Crosstalk-Solutions/unifi-toolkit.git
+git clone https://github.com/axelweichert/unifi-toolkit.git
 cd unifi-toolkit
 ./setup.sh  # Select 2 for Production
 # Enter: domain, username, password

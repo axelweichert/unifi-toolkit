@@ -8,7 +8,7 @@ The easiest way to install UI Toolkit on Synology:
 
 1. Create folders: `docker/unifi-toolkit/data/` and a `.env` file (see [Step 1](#step-1-create-folder-structure) and [Step 2](#step-2-create-configuration-file))
 2. Set permissions: `sudo chown -R 1000:1000 /volume1/docker/unifi-toolkit/data`
-3. In Container Manager → **Registry** → search `crosstalksolutions/unifi-toolkit` → **Download**
+3. In Container Manager → **Registry** → search `axelweichert/unifi-toolkit` → **Download**
 4. In **Image** → select the image → **Run** → configure ports and volumes → **Done**
 
 Full details in [Method A: Container Manager GUI](#method-a-container-manager-gui-recommended) below.
@@ -133,7 +133,7 @@ The easiest method - no SSH required for installation, and you get update notifi
 
 1. Open **Container Manager**
 2. Go to **Registry** in the left sidebar
-3. Search for: `crosstalksolutions/unifi-toolkit`
+3. Search for: `axelweichert/unifi-toolkit`
 4. Select the image and click **Download**
 5. Choose tag: `latest`
 6. Wait for download to complete (check **Image** section)
@@ -141,7 +141,7 @@ The easiest method - no SSH required for installation, and you get update notifi
 ### Step A2: Create the Container
 
 1. Go to **Image** in Container Manager
-2. Select `crosstalksolutions/unifi-toolkit`
+2. Select `axelweichert/unifi-toolkit`
 3. Click **Run**
 
 **General Settings:**
@@ -170,7 +170,7 @@ Click **Next**, review settings, click **Done**.
 Container Manager will show "Update available" when a new version is released:
 
 1. Go to **Image** in Container Manager
-2. You'll see an update indicator on `crosstalksolutions/unifi-toolkit`
+2. You'll see an update indicator on `axelweichert/unifi-toolkit`
 3. Click the image, click **Update**
 4. Go to **Container**, select `unifi-toolkit`
 5. Click **Action** → **Stop**
@@ -192,7 +192,7 @@ ssh your-admin-user@your-synology-ip
 ### Step B2: Pull the image
 
 ```bash
-sudo docker pull crosstalksolutions/unifi-toolkit:latest
+sudo docker pull axelweichert/unifi-toolkit:latest
 ```
 
 ### Step B3: Create and start the container
@@ -204,7 +204,7 @@ sudo docker run -d \
   -p 8000:8000 \
   -v /volume1/docker/unifi-toolkit/data:/app/data \
   -v /volume1/docker/unifi-toolkit/.env:/app/.env:ro \
-  crosstalksolutions/unifi-toolkit:latest
+  axelweichert/unifi-toolkit:latest
 ```
 
 ### Step B4: Verify it's running
@@ -219,7 +219,7 @@ You should see the container running. It will also appear in Container Manager's
 
 ```bash
 ssh your-admin-user@your-synology-ip
-sudo docker pull crosstalksolutions/unifi-toolkit:latest
+sudo docker pull axelweichert/unifi-toolkit:latest
 sudo docker stop unifi-toolkit && sudo docker rm unifi-toolkit
 sudo docker run -d \
   --name unifi-toolkit \
@@ -227,7 +227,7 @@ sudo docker run -d \
   -p 8000:8000 \
   -v /volume1/docker/unifi-toolkit/data:/app/data \
   -v /volume1/docker/unifi-toolkit/.env:/app/.env:ro \
-  crosstalksolutions/unifi-toolkit:latest
+  axelweichert/unifi-toolkit:latest
 ```
 
 ---
@@ -243,7 +243,7 @@ Create a file called `docker-compose.yml` in `/volume1/docker/unifi-toolkit/` wi
 ```yaml
 services:
   unifi-toolkit:
-    image: crosstalksolutions/unifi-toolkit:latest
+    image: axelweichert/unifi-toolkit:latest
     container_name: unifi-toolkit
     restart: unless-stopped
     ports:
@@ -260,7 +260,7 @@ You can create this file:
   cat > /volume1/docker/unifi-toolkit/docker-compose.yml << 'EOF'
   services:
     unifi-toolkit:
-      image: crosstalksolutions/unifi-toolkit:latest
+      image: axelweichert/unifi-toolkit:latest
       container_name: unifi-toolkit
       restart: unless-stopped
       ports:
@@ -342,8 +342,8 @@ sudo docker restart unifi-toolkit
 
 UI Toolkit is published to both Docker Hub and GitHub Container Registry:
 
-- **Docker Hub** (`crosstalksolutions/unifi-toolkit`) - Full Synology GUI support
-- **ghcr.io** (`ghcr.io/crosstalk-solutions/unifi-toolkit`) - Alternative registry
+- **Docker Hub** (`axelweichert/unifi-toolkit`) - Full Synology GUI support
+- **ghcr.io** (`ghcr.io/axelweichert/unifi-toolkit`) - Alternative registry
 
 We recommend Docker Hub (Method A) for Synology users because it provides the best GUI experience with update notifications.
 
@@ -390,5 +390,5 @@ The correct architecture is selected automatically when pulling.
 
 ## Getting Help
 
-- **GitHub Issues**: [Report a bug or request a feature](https://github.com/Crosstalk-Solutions/unifi-toolkit/issues)
-- **Discord**: [Crosstalk Solutions Discord](https://discord.com/invite/crosstalksolutions)
+- **GitHub Issues**: [Report a bug or request a feature](https://github.com/axelweichert/unifi-toolkit/issues)
+- **Discord](https://github.com/axelweichert/unifi-toolkit/issues)

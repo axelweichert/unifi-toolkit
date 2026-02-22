@@ -66,7 +66,7 @@ No authentication, access via `http://localhost:8000`
 
 ```bash
 # Clone and setup
-git clone https://github.com/Crosstalk-Solutions/unifi-toolkit.git
+git clone https://github.com/axelweichert/unifi-toolkit.git
 cd unifi-toolkit
 ./setup.sh  # Select 1 for Local
 
@@ -84,7 +84,7 @@ Authentication enabled, HTTPS with Let's Encrypt via Caddy
 
 ```bash
 # Clone and setup
-git clone https://github.com/Crosstalk-Solutions/unifi-toolkit.git
+git clone https://github.com/axelweichert/unifi-toolkit.git
 cd unifi-toolkit
 ./setup.sh  # Select 2 for Production
 # Enter: domain name, admin username, password
@@ -106,7 +106,7 @@ Access at **https://your-domain.com**
 |-------|-------------|
 | [INSTALLATION.md](docs/INSTALLATION.md) | Complete installation guide with troubleshooting |
 | [SYNOLOGY.md](docs/SYNOLOGY.md) | Synology NAS Container Manager setup |
-| [QNAP Guide](https://github.com/Crosstalk-Solutions/unifi-toolkit/issues/29) | QNAP Container Station setup (community) |
+| [QNAP Guide](https://github.com/axelweichert/unifi-toolkit/issues/29) | QNAP Container Station setup (community) |
 | [QUICKSTART.md](docs/QUICKSTART.md) | 5-minute quick start reference |
 
 ---
@@ -251,7 +251,7 @@ Never expose UniFi controllers via port forwarding
 
 ```bash
 # Clone repository
-git clone https://github.com/Crosstalk-Solutions/unifi-toolkit.git
+git clone https://github.com/axelweichert/unifi-toolkit.git
 cd unifi-toolkit
 
 # Create virtual environment (Python 3.9-3.12 only, NOT 3.13+)
@@ -330,23 +330,23 @@ pytest tests/ --cov=shared --cov=app -v
 
 ## Support
 
-- **Community**: [#unifi-toolkit on Discord](https://discord.com/invite/crosstalksolutions)
-- **Issues**: [GitHub Issues](https://github.com/Crosstalk-Solutions/unifi-toolkit/issues)
+- **Community**: [#unifi-toolkit on Discord](https://github.com/axelweichert/unifi-toolkit/issues)
+- **Issues**: [GitHub Issues](https://github.com/axelweichert/unifi-toolkit/issues)
 - **Documentation**: [docs/](docs/)
 
 ### Buy Me a Coffee
 
 If you find UI Toolkit useful, consider supporting development:
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/crosstalk)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://www.vonbusch.de)
 
 ---
 
 ## Credits
 
-Developed by [Crosstalk Solutions](https://www.crosstalksolutions.com/)
+Developed by [vonBusch GmbH](https://www.vonbusch.de/)
 
-- YouTube: [@CrosstalkSolutions](https://www.youtube.com/@CrosstalkSolutions)
+- YouTube: [@vonBusch](https://www.youtube.com/@vonBusch)
 
 ---
 

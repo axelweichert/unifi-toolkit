@@ -2,16 +2,16 @@
 name = "unifi-toolkit"
 version = "1.9.5"
 description = "A suite of tools for UniFi network management"
-authors = [{name = "Crosstalk Solutions"}]
+authors = [{name = "vonBusch GmbH"}]
 requires-python = ">=3.9,<3.13"
 license = {text = "MIT"}
 readme = "README.md"
 
 [project.urls]
-Homepage = "https://github.com/Crosstalk-Solutions/unifi-toolkit"
-Documentation = "https://github.com/Crosstalk-Solutions/unifi-toolkit/blob/main/README.md"
-Repository = "https://github.com/Crosstalk-Solutions/unifi-toolkit"
-Issues = "https://github.com/Crosstalk-Solutions/unifi-toolkit/issues"
+Homepage = "https://github.com/axelweichert/unifi-toolkit"
+Documentation = "https://github.com/axelweichert/unifi-toolkit/blob/main/README.md"
+Repository = "https://github.com/axelweichert/unifi-toolkit"
+Issues = "https://github.com/axelweichert/unifi-toolkit/issues"
 
 [tool.black]
 line-length = 100

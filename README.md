@@ -1,355 +1,373 @@
 # UI Toolkit
 
-A comprehensive suite of tools for UniFi network management and monitoring.
+Eine umfassende Suite von Tools für das UniFi-Netzwerkmanagement und -monitoring.
 
-> **Note:** This project is not affiliated with, endorsed by, or sponsored by Ubiquiti Inc. UniFi is a trademark of Ubiquiti Inc.
+> **Hinweis:** Dieses Projekt ist nicht mit Ubiquiti Inc. verbunden, wird von Ubiquiti Inc. weder befürwortet noch gesponsert. UniFi ist eine Marke von Ubiquiti Inc.
 
-<img width="1094" height="748" alt="image" src="https://github.com/user-attachments/assets/a167fc5c-9db5-48f2-8b43-0dfdab3b08a8" />
+![Dashboard](docs/toolkit_dashboard.png)
 
-## Features
+## Funktionen
 
 ### Dashboard
-Real-time system status including:
-- **Gateway Info** - Model, firmware, uptime
-- **Resource Usage** - CPU and RAM utilization
-- **Network Health** - WAN, LAN, WLAN, VPN status with diagnostic reasons
-- **Connected Clients** - Wired and wireless counts
-- **WAN Status** - IP, ISP, latency, uptime (supports multi-WAN)
+
+Echtzeit-Systemstatus mit:
+
+* **Gateway-Info** – Modell, Firmware, Laufzeit
+* **Ressourcenauslastung** – CPU- und RAM-Nutzung
+* **Netzwerkstatus** – WAN, LAN, WLAN, VPN-Status mit Diagnosegründen
+* **Verbundene Clients** – Kabelgebundene und WLAN-Anzahl
+* **WAN-Status** – IP, ISP, Latenz, Verfügbarkeit (Multi-WAN unterstützt)
 
 ### Wi-Fi Stalker
-Track specific Wi-Fi client devices through your UniFi infrastructure.
-- Device tracking by MAC address
-- Roaming detection between access points
-- Connection history with timestamps
-- Block/unblock devices directly from the UI
-- Blocked device indicator in device list
-- Webhook alerts (Slack, Discord, n8n) for connect, disconnect, roam, block, and unblock events
 
-<img width="1355" height="702" alt="image" src="https://github.com/user-attachments/assets/383d3c84-1b24-480a-bbaf-e72c47953b85" />
+Verfolge bestimmte WLAN-Geräte durch deine UniFi-Infrastruktur.
+
+* Geräteverfolgung per MAC-Adresse
+* Roaming-Erkennung zwischen Access Points
+* Verbindungsverlauf mit Zeitstempeln
+* Geräte direkt über die Oberfläche sperren/freischalten
+* Anzeige gesperrter Geräte in der Geräteliste
+* Webhook-Benachrichtigungen (Slack, Discord, n8n) für Verbindung, Trennung, Roaming, Sperrung und Freischaltung
+
+![Wi-Fi Stalker](docs/wifi_stalker.png)
 
 ### Threat Watch
-Monitor IDS/IPS security events from your UniFi gateway.
-- Real-time event monitoring
-- Threat categorization and analysis
-- Top attackers and targets
-- Webhook alerts (Slack, Discord, n8n)
 
-<img width="1359" height="468" alt="image" src="https://github.com/user-attachments/assets/7bfec7f7-bdf6-4ae2-af0e-143dcd982d4a" />
+Überwacht IDS/IPS-Sicherheitsereignisse deines UniFi-Gateways.
+
+* Echtzeit-Ereignisüberwachung
+* Bedrohungskategorisierung und -analyse
+* Top-Angreifer und Ziele
+* Webhook-Benachrichtigungen (Slack, Discord, n8n)
+
+![Threat Watch](docs/threat_watch.png)
 
 ### Network Pulse
-Real-time network monitoring dashboard.
-- Gateway status (model, firmware, uptime, WAN)
-- Device counts (total clients, wired, wireless, APs, switches)
-- Chart.js visualizations (clients by band, clients by SSID, top bandwidth)
-- Clickable AP cards with detailed client views
-- WebSocket-powered live updates
 
-<img width="1895" height="957" alt="image" src="https://github.com/user-attachments/assets/ca6f0df5-8657-4c2a-ad16-8807aa21bcac" />
+Echtzeit-Netzwerküberwachungs-Dashboard.
 
-### UI Product Selector *(External)*
-Build the perfect UniFi network at [uiproductselector.com](https://uiproductselector.com)
+* Gateway-Status (Modell, Firmware, Laufzeit, WAN)
+* Gerätezahlen (Clients gesamt, kabelgebunden, WLAN, APs, Switches)
+* Chart.js-Visualisierungen (Clients nach Band, Clients nach SSID, Top-Bandbreite)
+* Klickbare AP-Karten mit detaillierten Client-Ansichten
+* WebSocket-basierte Live-Updates
+
+![Network Pulse](docs/network_pulse.png)
+
+### UI Product Selector *(Extern)*
+
+Baue dein perfektes UniFi-Netzwerk auf [uiproductselector.com](https://uiproductselector.com)
 
 ---
 
-## Quick Start
+## Schnellstart
 
-### Requirements
-- **Docker** (recommended) or Python 3.9-3.12
-- **Ubuntu 22.04/24.04** (or other Linux)
-- Access to UniFi Controller
+### Voraussetzungen
 
-### Local Deployment (LAN Only)
+* **Docker** (empfohlen) oder Python 3.9–3.12
+* **Ubuntu 22.04/24.04** (oder anderes Linux)
+* Zugriff auf den UniFi Controller
 
-No authentication, access via `http://localhost:8000`
+### Lokale Installation (nur LAN)
 
-**Prerequisites:** Install Docker first - see [docs/INSTALLATION.md](docs/INSTALLATION.md#option-a-docker-installation-recommended)
+Keine Authentifizierung, Zugriff über `http://localhost:8000`
+
+**Voraussetzung:** Docker installieren – siehe [docs/INSTALLATION.md](docs/INSTALLATION.md#option-a-docker-installation-recommended)
 
 ```bash
-# Clone and setup
-git clone https://github.com/axelweichert/unifi-toolkit.git
+# Klonen und einrichten
+git clone https://github.com/Crosstalk-Solutions/unifi-toolkit.git
 cd unifi-toolkit
-./setup.sh  # Select 1 for Local
+./setup.sh  # Option 1 für Lokal wählen
 
-# Start
+# Starten
 docker compose up -d
 ```
 
-Access at **http://localhost:8000**
+Aufruf unter **http://localhost:8000**
 
-### Production Deployment (Internet-Facing)
+### Produktiv-Installation (Internetzugang)
 
-Authentication enabled, HTTPS with Let's Encrypt via Caddy
+Authentifizierung aktiviert, HTTPS mit Let's Encrypt via Caddy
 
-**Prerequisites:** Install Docker first - see [docs/INSTALLATION.md](docs/INSTALLATION.md#option-a-docker-installation-recommended)
+**Voraussetzung:** Docker installieren – siehe [docs/INSTALLATION.md](docs/INSTALLATION.md#option-a-docker-installation-recommended)
 
 ```bash
-# Clone and setup
-git clone https://github.com/axelweichert/unifi-toolkit.git
+# Klonen und einrichten
+git clone https://github.com/Crosstalk-Solutions/unifi-toolkit.git
 cd unifi-toolkit
-./setup.sh  # Select 2 for Production
-# Enter: domain name, admin username, password
+./setup.sh  # Option 2 für Produktion wählen
+# Eingabe: Domain, Admin-Benutzername, Passwort
 
-# Open firewall ports
+# Firewall-Ports öffnen
 sudo ufw allow 80/tcp && sudo ufw allow 443/tcp
 
-# Start with HTTPS
+# Mit HTTPS starten
 docker compose --profile production up -d
 ```
 
-Access at **https://your-domain.com**
+Aufruf unter **https://deine-domain.de**
 
 ---
 
-## Documentation
+## Dokumentation
 
-| Guide | Description |
-|-------|-------------|
-| [INSTALLATION.md](docs/INSTALLATION.md) | Complete installation guide with troubleshooting |
-| [SYNOLOGY.md](docs/SYNOLOGY.md) | Synology NAS Container Manager setup |
-| [QNAP Guide](https://github.com/axelweichert/unifi-toolkit/issues/29) | QNAP Container Station setup (community) |
-| [QUICKSTART.md](docs/QUICKSTART.md) | 5-minute quick start reference |
-
----
-
-## Common Commands
-
-| Action | Command |
-|--------|---------|
-| Start (local) | `docker compose up -d` |
-| Start (production) | `docker compose --profile production up -d` |
-| Stop | `docker compose down` |
-| View logs | `docker compose logs -f` |
-| Restart | `docker compose restart` |
-| Reset password | `./reset_password.sh` |
-| Update | `./upgrade.sh` |
+| Anleitung | Beschreibung |
+| --- | --- |
+| [INSTALLATION.md](docs/INSTALLATION.md) | Vollständige Installationsanleitung mit Fehlerbehebung |
+| [SYNOLOGY.md](docs/SYNOLOGY.md) | Synology NAS Container Manager Einrichtung |
+| [QNAP-Anleitung](https://github.com/Crosstalk-Solutions/unifi-toolkit/issues/29) | QNAP Container Station Einrichtung (Community) |
+| [QUICKSTART.md](docs/QUICKSTART.md) | 5-Minuten-Schnellstart-Referenz |
 
 ---
 
-## Configuration
+## Häufige Befehle
 
-### Setup Wizard (Recommended)
+| Aktion | Befehl |
+| --- | --- |
+| Starten (lokal) | `docker compose up -d` |
+| Starten (Produktion) | `docker compose --profile production up -d` |
+| Stoppen | `docker compose down` |
+| Logs anzeigen | `docker compose logs -f` |
+| Neustart | `docker compose restart` |
+| Passwort zurücksetzen | `./reset_password.sh` |
+| Aktualisieren | `./upgrade.sh` |
 
-Run the interactive setup wizard:
+---
+
+## Konfiguration
+
+### Einrichtungsassistent (Empfohlen)
+
+Den interaktiven Einrichtungsassistenten starten:
 
 ```bash
 ./setup.sh
 ```
 
-The wizard will:
-- Generate encryption key
-- Configure deployment mode (local/production)
-- Set up authentication (production only)
-- Create your `.env` file
+Der Assistent führt durch:
 
-### Manual Configuration
+* Generierung des Verschlüsselungsschlüssels
+* Konfiguration des Bereitstellungsmodus (lokal/Produktion)
+* Einrichtung der Authentifizierung (nur Produktion)
+* Erstellung der `.env`-Datei
 
-Copy and edit the example configuration:
+### Manuelle Konfiguration
+
+Beispielkonfiguration kopieren und bearbeiten:
 
 ```bash
 cp .env.example .env
 ```
 
-#### Required Settings
+#### Pflichteinstellungen
 
-| Variable | Description |
-|----------|-------------|
-| `ENCRYPTION_KEY` | Encrypts stored credentials (auto-generated by setup wizard) |
+| Variable | Beschreibung |
+| --- | --- |
+| `ENCRYPTION_KEY` | Verschlüsselt gespeicherte Zugangsdaten (wird vom Einrichtungsassistenten generiert) |
 
-#### Deployment Settings (Production Only)
+#### Bereitstellungseinstellungen (nur Produktion)
 
-| Variable | Description |
-|----------|-------------|
-| `DEPLOYMENT_TYPE` | `local` or `production` |
-| `DOMAIN` | Your domain name (e.g., `toolkit.example.com`) |
-| `AUTH_USERNAME` | Admin username |
-| `AUTH_PASSWORD_HASH` | Bcrypt password hash (generated by setup wizard) |
+| Variable | Beschreibung |
+| --- | --- |
+| `DEPLOYMENT_TYPE` | `local` oder `production` |
+| `DOMAIN` | Deine Domain (z. B. `toolkit.example.com`) |
+| `AUTH_USERNAME` | Admin-Benutzername |
+| `AUTH_PASSWORD_HASH` | Bcrypt-Passwort-Hash (wird vom Einrichtungsassistenten generiert) |
 
-#### UniFi Controller Settings
+#### UniFi Controller Einstellungen
 
-Configure via `.env` or the web UI (web UI takes precedence):
+Konfigurierbar über `.env` oder die Web-Oberfläche (Web-Oberfläche hat Vorrang):
 
-| Variable | Description |
-|----------|-------------|
-| `UNIFI_CONTROLLER_URL` | Controller URL (e.g., `https://192.168.1.1`) |
-| `UNIFI_USERNAME` | Username (legacy controllers) |
-| `UNIFI_PASSWORD` | Password (legacy controllers) |
-| `UNIFI_API_KEY` | API key (UniFi OS: UDM, UCG, Cloud Key) |
-| `UNIFI_SITE_ID` | Site ID from URL, not friendly name (default: `default`). For multi-site, use ID from `/manage/site/{id}/...` |
-| `UNIFI_VERIFY_SSL` | SSL verification (default: `false`) |
+| Variable | Beschreibung |
+| --- | --- |
+| `UNIFI_CONTROLLER_URL` | Controller-URL (z. B. `https://192.168.1.1`) |
+| `UNIFI_USERNAME` | Benutzername (ältere Controller) |
+| `UNIFI_PASSWORD` | Passwort (ältere Controller) |
+| `UNIFI_API_KEY` | API-Schlüssel (UniFi OS: UDM, UCG, Cloud Key) |
+| `UNIFI_SITE_ID` | Site-ID aus der URL, nicht der Anzeigename (Standard: `default`). Bei mehreren Sites die ID aus `/manage/site/{id}/...` verwenden |
+| `UNIFI_VERIFY_SSL` | SSL-Überprüfung (Standard: `false`) |
 
-#### Tool Settings
+#### Tool-Einstellungen
 
-| Variable | Description |
-|----------|-------------|
-| `STALKER_REFRESH_INTERVAL` | Device refresh interval in seconds (default: `60`) |
+| Variable | Beschreibung |
+| --- | --- |
+| `STALKER_REFRESH_INTERVAL` | Aktualisierungsintervall für Geräte in Sekunden (Standard: `60`) |
 
 ---
 
-## Security
+## Sicherheit
 
-### Authentication
+### Authentifizierung
 
-- **Local mode**: No authentication (trusted LAN only)
-- **Production mode**: Session-based authentication with bcrypt password hashing
-- **Rate limiting**: 5 failed login attempts = 5 minute lockout
+* **Lokaler Modus**: Keine Authentifizierung (nur vertrauenswürdiges LAN)
+* **Produktionsmodus**: Sitzungsbasierte Authentifizierung mit Bcrypt-Passwort-Hashing
+* **Rate-Limiting**: 5 fehlgeschlagene Anmeldeversuche = 5 Minuten Sperre
 
 ### HTTPS
 
-Production deployments use Caddy for automatic HTTPS:
-- Let's Encrypt certificates (auto-renewed)
-- HTTP to HTTPS redirect
-- Security headers (HSTS, X-Frame-Options, etc.)
+Produktiv-Installationen nutzen Caddy für automatisches HTTPS:
 
-### Multi-Site Networking
+* Let's Encrypt-Zertifikate (automatische Erneuerung)
+* HTTP-zu-HTTPS-Weiterleitung
+* Sicherheits-Header (HSTS, X-Frame-Options usw.)
 
-When managing multiple UniFi sites, always use site-to-site VPN:
+### Multi-Site-Netzwerk
+
+Bei der Verwaltung mehrerer UniFi-Sites immer Site-to-Site-VPN verwenden:
 
 ```
-✅ RECOMMENDED: VPN Connection
+✅ EMPFOHLEN: VPN-Verbindung
 ┌──────────────────┐         ┌──────────────────┐
-│  UI Toolkit      │◄──VPN──►│  Remote UniFi    │
-│  Server          │         │  Controller      │
+│  UI Toolkit      │◄──VPN──►│  Entfernter      │
+│  Server          │         │  UniFi Controller│
 └──────────────────┘         └──────────────────┘
 
-❌ AVOID: Direct Internet Exposure
-Never expose UniFi controllers via port forwarding
+❌ VERMEIDEN: Direkte Internetexposition
+UniFi Controller niemals per Port-Weiterleitung exponieren
 ```
 
-**VPN Options:** UniFi Site-to-Site, WireGuard, Tailscale, IPSec
+**VPN-Optionen:** UniFi Site-to-Site, WireGuard, Tailscale, IPSec
 
 ---
 
-## Troubleshooting
+## Fehlerbehebung
 
-### Can't connect to UniFi controller
-- Set `UNIFI_VERIFY_SSL=false` for self-signed certificates
-- UniFi OS devices (UDM, UCG) require an API key, not username/password
-- Verify network connectivity to controller
+### Keine Verbindung zum UniFi Controller
 
-### Device not showing as online
-- Wait 60 seconds for the next refresh cycle
-- Verify MAC address format is correct
-- Confirm device is connected in UniFi dashboard
+* `UNIFI_VERIFY_SSL=false` für selbstsignierte Zertifikate setzen
+* UniFi OS-Geräte (UDM, UCG) benötigen einen API-Schlüssel, kein Benutzername/Passwort
+* Netzwerkkonnektivität zum Controller prüfen
 
-### Let's Encrypt certificate fails
-- Verify DNS A record points to your server
-- Ensure ports 80 and 443 are open
-- Check Caddy logs: `docker compose logs caddy`
+### Gerät wird nicht als online angezeigt
 
-### Rate limited on login
-- Wait 5 minutes for lockout to expire
-- Use `./reset_password.sh` if you forgot your password
+* 60 Sekunden auf den nächsten Aktualisierungszyklus warten
+* MAC-Adress-Format prüfen
+* Sicherstellen, dass das Gerät im UniFi Dashboard verbunden ist
 
-### Docker issues
-- Verify `.env` exists and contains `ENCRYPTION_KEY`
-- Check logs: `docker compose logs -f`
-- Pull latest image: `docker compose pull && docker compose up -d`
+### Let's Encrypt-Zertifikat schlägt fehl
+
+* Sicherstellen, dass der DNS-A-Record auf den Server zeigt
+* Ports 80 und 443 müssen geöffnet sein
+* Caddy-Logs prüfen: `docker compose logs caddy`
+
+### Bei Anmeldung gesperrt
+
+* 5 Minuten warten, bis die Sperre abläuft
+* `./reset_password.sh` verwenden, wenn das Passwort vergessen wurde
+
+### Docker-Probleme
+
+* Sicherstellen, dass `.env` existiert und `ENCRYPTION_KEY` enthält
+* Logs prüfen: `docker compose logs -f`
+* Neuestes Image laden: `docker compose pull && docker compose up -d`
 
 ---
 
-## Running with Python (Alternative to Docker)
+## Mit Python ausführen (Alternative zu Docker)
 
 ```bash
-# Clone repository
-git clone https://github.com/axelweichert/unifi-toolkit.git
+# Repository klonen
+git clone https://github.com/Crosstalk-Solutions/unifi-toolkit.git
 cd unifi-toolkit
 
-# Create virtual environment (Python 3.9-3.12 only, NOT 3.13+)
+# Virtuelle Umgebung erstellen (nur Python 3.9–3.12, NICHT 3.13+)
 python3 -m venv venv
 source venv/bin/activate
 
-# Install dependencies
+# Abhängigkeiten installieren
 pip install -r requirements.txt
 
-# Run setup wizard
+# Einrichtungsassistenten starten
 ./setup.sh
 
-# Start application
+# Anwendung starten
 python run.py
 ```
 
 ---
 
-## Project Structure
+## Projektstruktur
 
 ```
 unifi-toolkit/
-├── app/                    # Main application
-│   ├── main.py            # FastAPI entry point
-│   ├── routers/           # API routes (auth, config)
-│   ├── static/            # CSS, images
-│   └── templates/         # HTML templates
-├── tools/                 # Individual tools
-│   ├── wifi_stalker/      # Wi-Fi Stalker tool
-│   ├── threat_watch/      # Threat Watch tool
-│   └── network_pulse/     # Network Pulse tool
-├── shared/                # Shared infrastructure
-│   ├── config.py          # Settings management
-│   ├── database.py        # SQLAlchemy setup
-│   ├── unifi_client.py    # UniFi API wrapper
-│   └── crypto.py          # Credential encryption
-├── docs/                  # Documentation
-├── data/                  # Database (created at runtime)
-├── setup.sh               # Setup wizard
-├── upgrade.sh             # Upgrade script
-├── reset_password.sh      # Password reset utility
-├── Caddyfile              # Reverse proxy config
-├── docker-compose.yml     # Docker configuration
-└── requirements.txt       # Python dependencies
+├── app/                    # Hauptanwendung
+│   ├── main.py            # FastAPI-Einstiegspunkt
+│   ├── routers/           # API-Routen (Auth, Konfiguration)
+│   ├── static/            # CSS, Bilder
+│   └── templates/         # HTML-Templates
+├── tools/                 # Einzelne Tools
+│   ├── wifi_stalker/      # Wi-Fi Stalker Tool
+│   ├── threat_watch/      # Threat Watch Tool
+│   └── network_pulse/     # Network Pulse Tool
+├── shared/                # Gemeinsame Infrastruktur
+│   ├── config.py          # Einstellungsverwaltung
+│   ├── database.py        # SQLAlchemy-Einrichtung
+│   ├── unifi_client.py    # UniFi API-Wrapper
+│   └── crypto.py          # Zugangsdaten-Verschlüsselung
+├── docs/                  # Dokumentation
+├── data/                  # Datenbank (wird zur Laufzeit erstellt)
+├── setup.sh               # Einrichtungsassistent
+├── upgrade.sh             # Aktualisierungsskript
+├── reset_password.sh      # Passwort-Reset-Tool
+├── Caddyfile              # Reverse-Proxy-Konfiguration
+├── docker-compose.yml     # Docker-Konfiguration
+└── requirements.txt       # Python-Abhängigkeiten
 ```
 
 ---
 
-## Development
+## Entwicklung
 
-### Running Tests
+### Tests ausführen
 
-The project includes a comprehensive test suite covering authentication, caching, configuration, and encryption.
+Das Projekt enthält eine umfassende Testsuite für Authentifizierung, Caching, Konfiguration und Verschlüsselung.
 
 ```bash
-# Install development dependencies
+# Entwicklungsabhängigkeiten installieren
 pip install -r requirements-dev.txt
 
-# Run all tests
+# Alle Tests ausführen
 pytest tests/ -v
 
-# Run specific test file
+# Bestimmte Testdatei ausführen
 pytest tests/test_auth.py -v
 
-# Run with coverage
+# Mit Abdeckungsbericht ausführen
 pytest tests/ --cov=shared --cov=app -v
 ```
 
-**Test modules:**
-- `tests/test_auth.py` - Authentication, session management, rate limiting (22 tests)
-- `tests/test_cache.py` - In-memory caching with TTL expiration (18 tests)
-- `tests/test_config.py` - Pydantic settings and environment variables (13 tests)
-- `tests/test_crypto.py` - Fernet encryption for credentials (15 tests)
+**Testmodule:**
+
+* `tests/test_auth.py` – Authentifizierung, Sitzungsverwaltung, Rate-Limiting (22 Tests)
+* `tests/test_cache.py` – In-Memory-Caching mit TTL-Ablauf (18 Tests)
+* `tests/test_config.py` – Pydantic-Einstellungen und Umgebungsvariablen (13 Tests)
+* `tests/test_crypto.py` – Fernet-Verschlüsselung für Zugangsdaten (15 Tests)
 
 ---
 
 ## Support
 
-- **Community**: [#unifi-toolkit on Discord](https://github.com/axelweichert/unifi-toolkit/issues)
-- **Issues**: [GitHub Issues](https://github.com/axelweichert/unifi-toolkit/issues)
-- **Documentation**: [docs/](docs/)
+* **Community**: [#unifi-toolkit auf Discord](https://discord.com/invite/crosstalksolutions)
+* **Fehler melden**: [GitHub Issues](https://github.com/Crosstalk-Solutions/unifi-toolkit/issues)
+* **Dokumentation**: [docs/](docs/)
 
-### Buy Me a Coffee
+### Unterstützung zeigen
 
-If you find UI Toolkit useful, consider supporting development:
+Wenn dir das UI Toolkit nützlich ist, kannst du die Entwicklung unterstützen:
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://www.vonbusch.digital)
-
----
-
-## Credits
-
-Developed by [vonBusch GmbH](https://www.vonbusch.digital/)
-
-- YouTube: [@vonBusch](https://www.youtube.com/@vonBusch)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/crosstalk)
 
 ---
 
-## License
+## Danksagungen
 
-MIT License
+Entwickelt von [Crosstalk Solutions](https://www.crosstalksolutions.com/)
+
+* YouTube: [@CrosstalkSolutions](https://www.youtube.com/@CrosstalkSolutions)
+
+---
+
+## Lizenz
+
+MIT-Lizenz

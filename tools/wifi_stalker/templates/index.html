@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wi-Fi Stalker - Device Tracking Dashboard</title>
+    <title>Wi-Fi Stalker - Geräte-Tracking Dashboard</title>
     <link rel="icon" type="image/jpeg" href="/static/images/favicon16x16.jpg">
     <link rel="stylesheet" href="/stalker/static/css/styles.css">
     <script>
@@ -22,19 +22,19 @@
         <header>
             <div class="header-top">
                 <a href="/" class="back-to-dashboard">
-                    ← Back to Dashboard
+                    ← Zurück zum Dashboard
                 </a>
             </div>
             <h1>📡 Wi-Fi Stalker</h1>
-            <p class="subtitle">Track Wi-Fi clients through UniFi infrastructure</p>
-            <p class="refresh-info">Device status refreshes automatically every <span x-text="refreshInterval || 60"></span> seconds</p>
+            <p class="subtitle">WLAN-Clients durch die UniFi-Infrastruktur verfolgen</p>
+            <p class="refresh-info">Gerätestatus wird automatisch alle <span x-text="refreshInterval || 60"></span> Sekunden aktualisiert</p>
             <div class="status-bar">
                 <span class="status-item">
-                    <span class="label">Last Refresh:</span>
-                    <span x-text="lastRefresh || 'Never'"></span>
+                    <span class="label">Letztes Update:</span>
+                    <span x-text="lastRefresh || 'Nie'"></span>
                 </span>
                 <span class="status-item">
-                    <span class="label">Tracked:</span>
+                    <span class="label">Verfolgt:</span>
                     <span x-text="trackedCount"></span>
                 </span>
                 <span class="status-item">
@@ -44,30 +44,30 @@
             </div>
         </header>
 
-        <!-- Main Content -->
+        <!-- Hauptinhalt -->
         <main>
-            <!-- Action Buttons -->
+            <!-- Aktionsschaltflächen -->
             <div class="action-bar">
                 <button @click="showAddDevice = true" class="btn btn-primary">
-                    + Add Device
+                    + Gerät hinzufügen
                 </button>
                 <button @click="loadUniFiClients()" class="btn btn-primary" :disabled="isLoadingClients">
-                    <span x-text="isLoadingClients ? 'Loading...' : '📡 Get Devices'"></span>
+                    <span x-text="isLoadingClients ? 'Wird geladen...' : '📡 Geräte abrufen'"></span>
                 </button>
                 <button type="button" @click="showWebhooks = true" class="btn btn-secondary">
                     🔔 Webhooks
                 </button>
             </div>
 
-            <!-- Search Box -->
+            <!-- Suchfeld -->
             <div class="search-box">
                 <input type="text"
                        x-model="searchQuery"
-                       placeholder="🔍 Search devices by name, MAC, IP, or AP..."
+                       placeholder="🔍 Geräte nach Name, MAC, IP oder AP suchen..."
                        class="search-input">
             </div>
 
-            <!-- Devices Table -->
+            <!-- Gerätetabelle -->
             <div class="table-container">
                 <table>
                     <thead>
@@ -77,44 +77,44 @@
                                 <span x-show="sortColumn === 'is_connected'" x-text="sortDirection === 'asc' ? '▲' : '▼'"></span>
                             </th>
                             <th @click="sortBy('friendly_name')" class="sortable">
-                                Friendly Name
+                                Anzeigename
                                 <span x-show="sortColumn === 'friendly_name'" x-text="sortDirection === 'asc' ? '▲' : '▼'"></span>
                             </th>
                             <th @click="sortBy('mac_address')" class="sortable">
-                                MAC Address
+                                MAC-Adresse
                                 <span x-show="sortColumn === 'mac_address'" x-text="sortDirection === 'asc' ? '▲' : '▼'"></span>
                             </th>
                             <th @click="sortBy('current_ip_address')" class="sortable">
-                                IP Address
+                                IP-Adresse
                                 <span x-show="sortColumn === 'current_ip_address'" x-text="sortDirection === 'asc' ? '▲' : '▼'"></span>
                             </th>
                             <th @click="sortBy('current_ap_name')" class="sortable">
-                                Connected To
+                                Verbunden mit
                                 <span x-show="sortColumn === 'current_ap_name'" x-text="sortDirection === 'asc' ? '▲' : '▼'"></span>
                             </th>
                             <th @click="sortBy('current_signal_strength')" class="sortable">
-                                Signal/Type
+                                Signal/Typ
                                 <span x-show="sortColumn === 'current_signal_strength'" x-text="sortDirection === 'asc' ? '▲' : '▼'"></span>
                             </th>
                             <th @click="sortBy('last_seen')" class="sortable">
-                                Last Seen
+                                Zuletzt gesehen
                                 <span x-show="sortColumn === 'last_seen'" x-text="sortDirection === 'asc' ? '▲' : '▼'"></span>
                             </th>
-                            <th>Actions</th>
+                            <th>Aktionen</th>
                         </tr>
                     </thead>
                     <tbody>
                         <template x-if="filteredDevices.length === 0 && devices.length === 0">
                             <tr>
                                 <td colspan="8" class="empty-state">
-                                    No devices tracked yet. Click "Add Device" to start tracking.
+                                    Noch keine Geräte verfolgt. Klicke auf „Gerät hinzufügen" um zu beginnen.
                                 </td>
                             </tr>
                         </template>
                         <template x-if="filteredDevices.length === 0 && devices.length > 0">
                             <tr>
                                 <td colspan="8" class="empty-state">
-                                    No devices match your search.
+                                    Keine Geräte entsprechen der Suche.
                                 </td>
                             </tr>
                         </template>
@@ -128,7 +128,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <strong x-text="device.friendly_name || 'Unnamed Device'"></strong>
+                                    <strong x-text="device.friendly_name || 'Unbenanntes Gerät'"></strong>
                                 </td>
                                 <td>
                                     <code x-text="device.mac_address"></code>
@@ -137,7 +137,7 @@
                                 <td>
                                     <template x-if="device.is_wired">
                                         <span class="wired-indicator">
-                                            🔌 <span x-text="device.current_switch_name ? device.current_switch_name + ' Port ' + device.current_switch_port : 'Wired'"></span>
+                                            🔌 <span x-text="device.current_switch_name ? device.current_switch_name + ' Port ' + device.current_switch_port : 'Kabelgebunden'"></span>
                                         </span>
                                     </template>
                                     <template x-if="!device.is_wired">
@@ -146,7 +146,7 @@
                                 </td>
                                 <td>
                                     <template x-if="device.is_wired">
-                                        <span class="wired-badge">Wired</span>
+                                        <span class="wired-badge">Kabelgebunden</span>
                                     </template>
                                     <template x-if="!device.is_wired">
                                         <span x-show="device.current_signal_strength"
@@ -161,7 +161,7 @@
                                 <td>
                                     <button @click.stop="deleteDevice(device.id)"
                                             class="btn btn-danger btn-small">
-                                        Delete
+                                        Löschen
                                     </button>
                                 </td>
                             </tr>
@@ -171,19 +171,19 @@
             </div>
         </main>
 
-        <!-- Add Device Modal -->
+        <!-- Gerät hinzufügen Modal -->
         <div x-show="showAddDevice"
              @click.self="showAddDevice = false"
              class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Add Device</h2>
+                    <h2>Gerät hinzufügen</h2>
                     <button @click="showAddDevice = false" class="close-btn">×</button>
                 </div>
                 <div class="modal-body">
                     <form @submit.prevent="addDevice()">
                         <div class="form-group">
-                            <label for="mac_address">MAC Address *</label>
+                            <label for="mac_address">MAC-Adresse *</label>
                             <input type="text"
                                    id="mac_address"
                                    x-model="newDevice.mac_address"
@@ -192,23 +192,23 @@
                                    required>
                         </div>
                         <div class="form-group">
-                            <label for="friendly_name">Friendly Name</label>
+                            <label for="friendly_name">Anzeigename</label>
                             <input type="text"
                                    id="friendly_name"
                                    x-model="newDevice.friendly_name"
-                                   placeholder="John's iPhone">
+                                   placeholder="Maxs iPhone">
                         </div>
                         <div class="form-group">
-                            <label for="site_id">Site ID</label>
+                            <label for="site_id">Standort-ID</label>
                             <input type="text"
                                    id="site_id"
                                    x-model="newDevice.site_id"
                                    value="default">
                         </div>
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">Add Device</button>
+                            <button type="submit" class="btn btn-primary">Gerät hinzufügen</button>
                             <button type="button" @click="showAddDevice = false" class="btn btn-secondary">
-                                Cancel
+                                Abbrechen
                             </button>
                         </div>
                     </form>
@@ -216,7 +216,7 @@
             </div>
         </div>
 
-        <!-- Webhooks Modal -->
+        <!-- Webhooks-Modal -->
         <div x-show="showWebhooks"
              @click.self="showWebhooks = false"
              class="modal">
@@ -227,17 +227,15 @@
                 </div>
                 <div class="modal-body">
                     <p class="subtitle">
-                        Configure webhooks to receive notifications when devices connect, disconnect, or roam.
+                        Webhooks konfigurieren, um Benachrichtigungen zu erhalten, wenn Geräte verbinden, trennen oder roamen.
                     </p>
 
-                    <!-- Add Webhook Button -->
                     <button @click="showAddWebhook = true" class="btn btn-primary webhook-add-btn">
-                        + Add Webhook
+                        + Webhook hinzufügen
                     </button>
 
-                    <!-- Webhooks List -->
                     <div x-show="webhooks.length === 0" class="empty-state">
-                        No webhooks configured. Click "Add Webhook" to create one.
+                        Keine Webhooks konfiguriert. Klicke auf „Webhook hinzufügen" um einen zu erstellen.
                     </div>
 
                     <div x-show="webhooks.length > 0" class="webhooks-list">
@@ -247,20 +245,20 @@
                                     <div class="webhook-item-info">
                                         <strong x-text="webhook.name"></strong>
                                         <span class="badge webhook-type-badge" x-text="webhook.webhook_type"></span>
-                                        <span x-show="!webhook.enabled" class="badge webhook-disabled-badge">Disabled</span>
+                                        <span x-show="!webhook.enabled" class="badge webhook-disabled-badge">Deaktiviert</span>
                                         <div class="webhook-events">
-                                            Events:
-                                            <span x-show="webhook.event_device_connected">Connected</span>
-                                            <span x-show="webhook.event_device_disconnected">Disconnected</span>
-                                            <span x-show="webhook.event_device_roamed">Roamed</span>
-                                            <span x-show="webhook.event_device_blocked">Blocked</span>
-                                            <span x-show="webhook.event_device_unblocked">Unblocked</span>
+                                            Ereignisse:
+                                            <span x-show="webhook.event_device_connected">Verbunden</span>
+                                            <span x-show="webhook.event_device_disconnected">Getrennt</span>
+                                            <span x-show="webhook.event_device_roamed">Geroamt</span>
+                                            <span x-show="webhook.event_device_blocked">Blockiert</span>
+                                            <span x-show="webhook.event_device_unblocked">Entsperrt</span>
                                         </div>
                                     </div>
                                     <div class="webhook-item-actions">
-                                        <button @click="testWebhook(webhook.id)" class="btn btn-sm btn-secondary">Test</button>
-                                        <button @click="editWebhook(webhook)" class="btn btn-sm btn-secondary">Edit</button>
-                                        <button @click="deleteWebhook(webhook.id)" class="btn btn-sm btn-danger">Delete</button>
+                                        <button @click="testWebhook(webhook.id)" class="btn btn-sm btn-secondary">Testen</button>
+                                        <button @click="editWebhook(webhook)" class="btn btn-sm btn-secondary">Bearbeiten</button>
+                                        <button @click="deleteWebhook(webhook.id)" class="btn btn-sm btn-danger">Löschen</button>
                                     </div>
                                 </div>
                             </div>
@@ -270,13 +268,13 @@
             </div>
         </div>
 
-        <!-- Add/Edit Webhook Modal -->
+        <!-- Webhook hinzufügen/bearbeiten Modal -->
         <div x-show="showAddWebhook || showEditWebhook"
              @click.self="showAddWebhook = false; showEditWebhook = false"
              class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 x-text="showEditWebhook ? 'Edit Webhook' : 'Add Webhook'"></h2>
+                    <h2 x-text="showEditWebhook ? 'Webhook bearbeiten' : 'Webhook hinzufügen'"></h2>
                     <button @click="showAddWebhook = false; showEditWebhook = false" class="close-btn">×</button>
                 </div>
                 <div class="modal-body">
@@ -287,20 +285,20 @@
                                    id="webhook_name"
                                    x-model="webhookForm.name"
                                    required
-                                   placeholder="My Slack Webhook">
+                                   placeholder="Mein Slack Webhook">
                         </div>
 
                         <div class="form-group">
-                            <label for="webhook_type">Type</label>
+                            <label for="webhook_type">Typ</label>
                             <select id="webhook_type" x-model="webhookForm.webhook_type" required>
                                 <option value="slack">Slack</option>
                                 <option value="discord">Discord</option>
-                                <option value="n8n">n8n / Generic</option>
+                                <option value="n8n">n8n / Generisch</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="webhook_url">Webhook URL</label>
+                            <label for="webhook_url">Webhook-URL</label>
                             <input type="url"
                                    id="webhook_url"
                                    x-model="webhookForm.url"
@@ -309,27 +307,27 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Trigger Events</label>
+                            <label>Auslöseereignisse</label>
                             <div>
                                 <label class="checkbox-label">
                                     <input type="checkbox" x-model="webhookForm.event_device_connected">
-                                    Device Connected
+                                    Gerät verbunden
                                 </label>
                                 <label class="checkbox-label">
                                     <input type="checkbox" x-model="webhookForm.event_device_disconnected">
-                                    Device Disconnected
+                                    Gerät getrennt
                                 </label>
                                 <label class="checkbox-label">
                                     <input type="checkbox" x-model="webhookForm.event_device_roamed">
-                                    Device Roamed
+                                    Gerät geroamt
                                 </label>
                                 <label class="checkbox-label">
                                     <input type="checkbox" x-model="webhookForm.event_device_blocked">
-                                    Device Blocked
+                                    Gerät blockiert
                                 </label>
                                 <label class="checkbox-label">
                                     <input type="checkbox" x-model="webhookForm.event_device_unblocked">
-                                    Device Unblocked
+                                    Gerät entsperrt
                                 </label>
                             </div>
                         </div>
@@ -337,14 +335,14 @@
                         <div class="form-group">
                             <label>
                                 <input type="checkbox" x-model="webhookForm.enabled">
-                                Enabled
+                                Aktiviert
                             </label>
                         </div>
 
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">Save Webhook</button>
+                            <button type="submit" class="btn btn-primary">Webhook speichern</button>
                             <button type="button" @click="showAddWebhook = false; showEditWebhook = false" class="btn btn-secondary">
-                                Cancel
+                                Abbrechen
                             </button>
                         </div>
                     </form>
@@ -352,34 +350,33 @@
             </div>
         </div>
 
-        <!-- Get Devices Modal -->
+        <!-- Geräte abrufen Modal -->
         <div x-show="showGetDevices"
              @click.self="showGetDevices = false"
              class="modal">
             <div class="modal-content modal-large">
                 <div class="modal-header">
-                    <h2>UniFi Connected Clients</h2>
+                    <h2>UniFi-Verbundene Clients</h2>
                     <button @click="showGetDevices = false" class="close-btn">×</button>
                 </div>
                 <div class="modal-body">
                     <p class="subtitle modal-subtitle">
-                        Select devices to track. Already-tracked devices are pre-checked.
+                        Zu verfolgende Geräte auswählen. Bereits verfolgte Geräte sind vorausgewählt.
                     </p>
 
-                    <!-- Search Filter -->
                     <div x-show="unifiClients.length > 0" class="modal-search">
                         <input type="text"
                                x-model="unifiClientSearch"
-                               placeholder="Search by name, MAC address, or IP..."
+                               placeholder="Nach Name, MAC-Adresse oder IP suchen..."
                                class="search-input">
                     </div>
 
                     <div x-show="unifiClients.length === 0" class="empty-state">
-                        No clients found on UniFi controller.
+                        Keine Clients am UniFi-Controller gefunden.
                     </div>
 
                     <div x-show="filteredUnifiClients.length === 0 && unifiClients.length > 0" class="empty-state">
-                        No clients match your search.
+                        Keine Clients entsprechen der Suche.
                     </div>
 
                     <div x-show="filteredUnifiClients.length > 0" class="clients-list">
@@ -391,12 +388,12 @@
                                            @change="toggleClientSelection(client.mac_address)">
                                     <div class="client-info">
                                         <div class="client-name">
-                                            <strong x-text="client.name || 'Unknown Device'"></strong>
-                                            <span x-show="client.is_tracked" class="badge-tracked">Already Tracking</span>
-                                            <!-- iPhone/iPad MAC Randomization Warning -->
+                                            <strong x-text="client.name || 'Unbekanntes Gerät'"></strong>
+                                            <span x-show="client.is_tracked" class="badge-tracked">Wird bereits verfolgt</span>
+                                            <!-- iPhone/iPad MAC-Randomisierung Hinweis -->
                                             <span x-show="isAppleDevice(client.name)"
                                                   class="info-tooltip"
-                                                  title="iPhone/iPad MAC addresses may be randomized. To change: Open Settings > Wi-Fi > Tap (i) next to your network > Set 'Private Wi-Fi Address' to 'Fixed' (consistent random MAC) or 'Off' (uses device's actual MAC)">
+                                                  title="iPhone/iPad MAC-Adressen können zufällig sein. Zum Ändern: Einstellungen öffnen > WLAN > (i) neben dem Netzwerk > 'Private WLAN-Adresse' auf 'Fest' (konsistente zufällige MAC) oder 'Aus' (echte Geräte-MAC)">
                                                 ℹ️
                                             </span>
                                         </div>
@@ -411,46 +408,46 @@
 
                     <div class="form-actions modal-actions">
                         <button @click="stalkSelectedDevices()" class="btn btn-primary">
-                            <span x-text="'Stalk (' + selectedClients.size + ' selected)'"></span>
+                            <span x-text="'Verfolgen (' + selectedClients.size + ' ausgewählt)'"></span>
                         </button>
                         <button @click="showGetDevices = false" class="btn btn-secondary">
-                            Cancel
+                            Abbrechen
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Device Details Modal -->
+        <!-- Gerätedetails Modal -->
         <div x-show="showDeviceDetails"
              @click.self="showDeviceDetails = false"
              class="modal">
             <div class="modal-content modal-xlarge">
                 <div class="modal-header">
-                    <h2 x-text="(deviceDetails?.friendly_name || deviceDetails?.mac_address || 'Device') + ' Details'"></h2>
+                    <h2 x-text="(deviceDetails?.friendly_name || deviceDetails?.mac_address || 'Gerät') + ' Details'"></h2>
                     <button @click="showDeviceDetails = false" class="close-btn">×</button>
                 </div>
                 <div class="modal-body" x-show="deviceDetails">
-                    <!-- Live data loading indicator -->
+                    <!-- Live-Daten Ladeindikator -->
                     <div class="live-data-loading" x-show="deviceDetails?._loading_live_data">
-                        <span class="loading-dot"></span> Fetching live data from UniFi...
+                        <span class="loading-dot"></span> Live-Daten werden von UniFi abgerufen...
                     </div>
 
-                    <!-- Device Info Grid -->
+                    <!-- Geräteinfo-Raster -->
                     <div class="device-info-grid">
-                        <!-- Basic Info -->
+                        <!-- Grundinformationen -->
                         <div class="info-section">
-                            <h3>Basic Information</h3>
+                            <h3>Grundinformationen</h3>
                             <div class="info-item">
-                                <span class="info-label">Friendly Name:</span>
-                                <span class="info-value" x-text="deviceDetails?.friendly_name || 'Not set'"></span>
+                                <span class="info-label">Anzeigename:</span>
+                                <span class="info-value" x-text="deviceDetails?.friendly_name || 'Nicht gesetzt'"></span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">MAC Address:</span>
+                                <span class="info-label">MAC-Adresse:</span>
                                 <code x-text="deviceDetails?.mac_address"></code>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">IP Address:</span>
+                                <span class="info-label">IP-Adresse:</span>
                                 <span class="info-value" x-text="deviceDetails?.current_ip_address || '-'"></span>
                             </div>
                             <div class="info-item">
@@ -458,7 +455,7 @@
                                 <span class="info-value" x-text="deviceDetails?.hostname || '-'"></span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Manufacturer:</span>
+                                <span class="info-label">Hersteller:</span>
                                 <span class="info-value" x-text="deviceDetails?.manufacturer || '-'"></span>
                             </div>
                             <div class="info-item">
@@ -466,22 +463,22 @@
                                 <span x-text="deviceDetails?.is_connected ? '🟢 Online' : '🔴 Offline'"></span>
                             </div>
                             <div class="info-item" x-show="deviceDetails?.is_blocked">
-                                <span class="info-label">Blocked:</span>
-                                <span class="badge-blocked">⛔ Device is blocked</span>
+                                <span class="info-label">Blockiert:</span>
+                                <span class="badge-blocked">⛔ Gerät ist blockiert</span>
                             </div>
                         </div>
 
-                        <!-- Connection Info -->
+                        <!-- Verbindungsinformationen -->
                         <div class="info-section">
-                            <h3>Connection Information</h3>
+                            <h3>Verbindungsinformationen</h3>
                             <div class="info-item">
-                                <span class="info-label">Connection Type:</span>
+                                <span class="info-label">Verbindungstyp:</span>
                                 <span class="info-value">
-                                    <span x-show="deviceDetails?.is_wired" class="wired-badge">🔌 Wired</span>
-                                    <span x-show="!deviceDetails?.is_wired">📶 Wireless</span>
+                                    <span x-show="deviceDetails?.is_wired" class="wired-badge">🔌 Kabelgebunden</span>
+                                    <span x-show="!deviceDetails?.is_wired">📶 Kabellos</span>
                                 </span>
                             </div>
-                            <!-- Wired device info -->
+                            <!-- Kabelgebundenes Gerät -->
                             <template x-if="deviceDetails?.is_wired">
                                 <div>
                                     <div class="info-item">
@@ -494,22 +491,22 @@
                                     </div>
                                 </div>
                             </template>
-                            <!-- Wireless device info -->
+                            <!-- Kabelloses Gerät -->
                             <template x-if="!deviceDetails?.is_wired">
                                 <div>
                                     <div class="info-item">
-                                        <span class="info-label">Current AP:</span>
+                                        <span class="info-label">Aktueller AP:</span>
                                         <span class="info-value" x-text="deviceDetails?.current_ap_name || '-'"></span>
                                     </div>
                                     <div class="info-item" x-show="favoriteAP?.has_data">
-                                        <span class="info-label">Favorite AP:</span>
+                                        <span class="info-label">Bevorzugter AP:</span>
                                         <span class="info-value">
                                             <span class="favorite-badge">⭐</span>
                                             <span x-text="favoriteAP?.ap_name"></span>
                                         </span>
                                     </div>
                                     <div class="info-item">
-                                        <span class="info-label">Signal Strength:</span>
+                                        <span class="info-label">Signalstärke:</span>
                                         <span x-show="deviceDetails?.current_signal_strength"
                                               class="signal-badge"
                                               :class="getSignalClass(deviceDetails?.current_signal_strength)"
@@ -518,11 +515,11 @@
                                         <span x-show="!deviceDetails?.current_signal_strength">-</span>
                                     </div>
                                     <div class="info-item">
-                                        <span class="info-label">Radio Band:</span>
+                                        <span class="info-label">Frequenzband:</span>
                                         <span class="info-value" x-text="getRadioBand(deviceDetails?.radio)"></span>
                                     </div>
                                     <div class="info-item">
-                                        <span class="info-label">Channel:</span>
+                                        <span class="info-label">Kanal:</span>
                                         <span class="info-value" x-text="deviceDetails?.channel || '-'"></span>
                                     </div>
                                 </div>
@@ -538,88 +535,88 @@
                             </div>
                         </div>
 
-                        <!-- Usage Info -->
+                        <!-- Nutzungsstatistiken -->
                         <div class="info-section">
-                            <h3>Usage Statistics</h3>
+                            <h3>Nutzungsstatistiken</h3>
                             <div class="info-item">
-                                <span class="info-label">Data Transmitted:</span>
+                                <span class="info-label">Übertragene Daten:</span>
                                 <span class="info-value" x-text="formatBytes(deviceDetails?.tx_bytes)"></span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Data Received:</span>
+                                <span class="info-label">Empfangene Daten:</span>
                                 <span class="info-value" x-text="formatBytes(deviceDetails?.rx_bytes)"></span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Session Uptime:</span>
+                                <span class="info-label">Sitzungslaufzeit:</span>
                                 <span class="info-value" x-text="deviceDetails?.uptime ? formatDuration(deviceDetails.uptime) : '-'"></span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Last Seen:</span>
+                                <span class="info-label">Zuletzt gesehen:</span>
                                 <span class="info-value" x-text="formatDateTime(deviceDetails?.last_seen)"></span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Added:</span>
+                                <span class="info-label">Hinzugefügt:</span>
                                 <span class="info-value" x-text="formatDateTime(deviceDetails?.added_at)"></span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Analytics Section (wireless only) -->
+                    <!-- Analyse-Bereich (nur kabellos) -->
                     <div class="analytics-section" x-show="!deviceDetails?.is_wired">
-                        <h3>Device Analytics</h3>
+                        <h3>Geräteanalyse</h3>
 
-                        <!-- Analytics Loading State -->
+                        <!-- Analyse wird geladen -->
                         <div class="analytics-loading" x-show="analyticsLoading">
                             <div class="loading-spinner"></div>
-                            <span>Loading analytics...</span>
+                            <span>Analyse wird geladen...</span>
                         </div>
 
-                        <!-- Analytics Error State -->
+                        <!-- Analysefehler -->
                         <div class="analytics-error" x-show="analyticsError && !analyticsLoading">
                             <span x-text="analyticsError"></span>
                         </div>
 
-                        <!-- Analytics Content -->
+                        <!-- Analyseinhalt -->
                         <div class="analytics-grid" x-show="!analyticsLoading && !analyticsError">
-                            <!-- Dwell Time Chart -->
+                            <!-- Verweilzeit-Diagramm -->
                             <div class="analytics-card">
                                 <div class="analytics-header">
-                                    <span class="analytics-title">Dwell Time by AP</span>
+                                    <span class="analytics-title">Verweilzeit nach AP</span>
                                     <select x-model="dwellTimeWindow" @change="loadDwellTime()" class="analytics-select">
-                                        <option value="24h">Last 24 Hours</option>
-                                        <option value="7d">Last 7 Days</option>
-                                        <option value="30d">Last 30 Days</option>
-                                        <option value="all">All Time</option>
+                                        <option value="24h">Letzte 24 Stunden</option>
+                                        <option value="7d">Letzte 7 Tage</option>
+                                        <option value="30d">Letzte 30 Tage</option>
+                                        <option value="all">Gesamte Zeit</option>
                                     </select>
                                 </div>
                                 <div class="chart-container" x-show="dwellTimeData && dwellTimeData.total_minutes > 0">
                                     <canvas id="dwellTimeChart"></canvas>
                                 </div>
                                 <div class="no-data-message" x-show="dwellTimeData && dwellTimeData.total_minutes === 0">
-                                    No dwell time data available for this period.
+                                    Keine Verweilzeitdaten für diesen Zeitraum verfügbar.
                                 </div>
                                 <a href="#"
                                    @click.prevent="toggleDwellTimeDisplay()"
                                    class="toggle-link"
                                    x-show="dwellTimeData && dwellTimeData.total_minutes > 0">
-                                    Show <span x-text="dwellTimeShowHours ? 'percentages' : 'hours'"></span>
+                                    <span x-text="dwellTimeShowHours ? 'Prozentanzeige' : 'Stundenanzeige'"></span> anzeigen
                                 </a>
                             </div>
 
-                            <!-- Presence Heat Map -->
+                            <!-- Anwesenheits-Heatmap -->
                             <div class="analytics-card">
                                 <div class="analytics-header">
-                                    <span class="analytics-title">Presence Pattern</span>
+                                    <span class="analytics-title">Anwesenheitsmuster</span>
                                 </div>
                                 <div class="heat-map-wrapper" x-show="presencePattern && presencePattern.has_sufficient_data">
-                                    <!-- Day labels header -->
+                                    <!-- Tagesbeschriftungen -->
                                     <div class="heat-map-header">
                                         <div class="heat-map-corner"></div>
-                                        <template x-for="day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']">
+                                        <template x-for="day in ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']">
                                             <div class="heat-map-day-label" x-text="day"></div>
                                         </template>
                                     </div>
-                                    <!-- Heat map grid with 2-hour block labels -->
+                                    <!-- Heatmap-Raster -->
                                     <div class="heat-map-body">
                                         <template x-for="(row, block) in getAggregatedPresenceData()" :key="block">
                                             <div class="heat-map-row">
@@ -633,98 +630,98 @@
                                             </div>
                                         </template>
                                     </div>
-                                    <!-- Legend -->
+                                    <!-- Legende -->
                                     <div class="heat-map-legend">
-                                        <span class="legend-label">Less</span>
+                                        <span class="legend-label">Weniger</span>
                                         <div class="legend-cell heat-never"></div>
                                         <div class="legend-cell heat-rare"></div>
                                         <div class="legend-cell heat-low"></div>
                                         <div class="legend-cell heat-medium"></div>
                                         <div class="legend-cell heat-high"></div>
-                                        <span class="legend-label">More</span>
+                                        <span class="legend-label">Mehr</span>
                                     </div>
                                 </div>
                                 <div class="no-data-message" x-show="presencePattern && !presencePattern.has_sufficient_data">
-                                    Presence patterns require at least 7 days of data.
+                                    Anwesenheitsmuster benötigen mindestens 7 Tage Daten.
                                     <span x-show="presencePattern.days_of_data > 0">
-                                        Currently have <span x-text="presencePattern.days_of_data"></span> day(s).
+                                        Aktuell vorhanden: <span x-text="presencePattern.days_of_data"></span> Tag(e).
                                     </span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Action Buttons -->
+                    <!-- Aktionsschaltflächen -->
                     <div class="form-actions modal-actions">
                         <button @click="viewHistory(deviceDetails.id)" class="btn btn-primary">
-                            📊 View History
+                            📊 Verlauf anzeigen
                         </button>
                         <button @click="updateUniFiName(deviceDetails.id)" class="btn btn-secondary">
-                            ✏️ Update Name in UniFi
+                            ✏️ Name in UniFi aktualisieren
                         </button>
                         <button x-show="!deviceDetails?.is_blocked"
                                 @click="blockDevice(deviceDetails.id)"
                                 class="btn btn-danger">
-                            ⛔ Block Device
+                            ⛔ Gerät blockieren
                         </button>
                         <button x-show="deviceDetails?.is_blocked"
                                 @click="unblockDevice(deviceDetails.id)"
                                 class="btn btn-success">
-                            ✅ Unblock Device
+                            ✅ Gerät entsperren
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- History Modal -->
+        <!-- Verlauf-Modal -->
         <div x-show="showHistory"
              @click.self="showHistory = false"
              class="modal">
             <div class="modal-content modal-large">
                 <div class="modal-header">
-                    <h2 x-text="(currentDevice?.friendly_name || currentDevice?.mac_address || 'Device') + ' Connection History'"></h2>
+                    <h2 x-text="(currentDevice?.friendly_name || currentDevice?.mac_address || 'Gerät') + ' Verbindungsverlauf'"></h2>
                     <button @click="showHistory = false" class="close-btn">×</button>
                 </div>
                 <div class="modal-body">
                     <div x-show="history.length === 0" class="empty-state">
-                        No history available for this device.
+                        Kein Verlauf für dieses Gerät verfügbar.
                     </div>
                     <div x-show="history.length > 0">
                         <div class="history-actions">
                             <button @click="exportHistory(currentDevice.id)" class="btn btn-secondary">
-                                📥 Export to CSV
+                                📥 Als CSV exportieren
                             </button>
                         </div>
                         <div class="history-list">
                             <template x-for="entry in history" :key="entry.id">
                                 <div class="history-entry">
                                     <div class="history-ap">
-                                        <!-- Wired connection history -->
+                                        <!-- Kabelgebundener Verbindungsverlauf -->
                                         <template x-if="entry.is_wired">
                                             <div>
                                                 <span class="wired-badge-small">🔌</span>
-                                                <strong x-text="(entry.switch_name || 'Unknown Switch') + ' Port ' + (entry.switch_port || '?')"></strong>
+                                                <strong x-text="(entry.switch_name || 'Unbekannter Switch') + ' Port ' + (entry.switch_port || '?')"></strong>
                                                 <code x-text="entry.switch_mac"></code>
                                             </div>
                                         </template>
-                                        <!-- Wireless connection history -->
+                                        <!-- Kabelloser Verbindungsverlauf -->
                                         <template x-if="!entry.is_wired">
                                             <div>
-                                                <strong x-text="entry.ap_name || 'Unknown AP'"></strong>
+                                                <strong x-text="entry.ap_name || 'Unbekannter AP'"></strong>
                                                 <code x-text="entry.ap_mac"></code>
                                             </div>
                                         </template>
                                     </div>
                                     <div class="history-time">
                                         <div>
-                                            Connected: <span x-text="formatDateTime(entry.connected_at)"></span>
+                                            Verbunden: <span x-text="formatDateTime(entry.connected_at)"></span>
                                         </div>
                                         <div x-show="entry.disconnected_at">
-                                            Disconnected: <span x-text="formatDateTime(entry.disconnected_at)"></span>
+                                            Getrennt: <span x-text="formatDateTime(entry.disconnected_at)"></span>
                                         </div>
                                         <div x-show="entry.duration_seconds">
-                                            Duration: <span x-text="formatDuration(entry.duration_seconds)"></span>
+                                            Dauer: <span x-text="formatDuration(entry.duration_seconds)"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -735,7 +732,7 @@
             </div>
         </div>
 
-        <!-- Toast Notifications -->
+        <!-- Toast-Benachrichtigungen -->
         <div class="toast-container">
             <div x-show="toast.show"
                  x-transition
@@ -746,8 +743,8 @@
 
         <!-- Footer -->
         <footer class="app-footer">
-            <p><a href="https://github.com/axelweichert/unifi-toolkit" target="_blank">UI Toolkit - Wi-Fi Stalker</a> v{{ version }} | by <a href="https://www.vonbusch.digital" target="_blank">vonBusch GmbH</a> | <a href="#" id="report-issue-link">Report Issue</a></p>
-            <p class="footer-disclaimer">Not affiliated with Ubiquiti Inc. UniFi is a trademark of Ubiquiti Inc.</p>
+            <p><a href="https://github.com/axelweichert/unifi-toolkit" target="_blank">UI Toolkit - Wi-Fi Stalker</a> v{{ version }} | by <a href="https://www.vonbusch.digital" target="_blank">vonBusch GmbH</a> | <a href="#" id="report-issue-link">Problem melden</a></p>
+            <p class="footer-disclaimer">Nicht verbunden mit Ubiquiti Inc. UniFi ist eine Marke von Ubiquiti Inc.</p>
         </footer>
     </div>
 
@@ -761,35 +758,35 @@
             reportLink.addEventListener('click', async function(e) {
                 e.preventDefault();
 
-                let body = `## Description
-<!-- Please describe the issue you're experiencing -->
+                let body = `## Beschreibung
+<!-- Bitte beschreibe das Problem -->
 
 
-## Steps to Reproduce
+## Schritte zur Reproduktion
 1.
 2.
 3.
 
-## Expected Behavior
+## Erwartetes Verhalten
 
 
-## Actual Behavior
+## Tatsächliches Verhalten
 
 
-## Environment
+## Umgebung
 `;
 
                 try {
                     const response = await fetch('/api/debug-info');
                     const info = await response.json();
 
-                    body += `- **App Version:** ${info.app_version}\n`;
+                    body += `- **App-Version:** ${info.app_version}\n`;
                     body += `- **Tool:** Wi-Fi Stalker ${info.tool_versions.wifi_stalker}\n`;
-                    body += `- **Deployment:** ${info.deployment.type}, Docker: ${info.deployment.docker ? 'Yes' : 'No'}, Python: ${info.deployment.python_version}\n`;
+                    body += `- **Deployment:** ${info.deployment.type}, Docker: ${info.deployment.docker ? 'Ja' : 'Nein'}, Python: ${info.deployment.python_version}\n`;
                     if (info.gateway.model) {
                         let gatewayStr = info.gateway.model;
                         if (info.gateway.name) gatewayStr += ` (${info.gateway.name})`;
-                        body += `- **Gateway:** ${gatewayStr}, UniFi OS: ${info.gateway.is_unifi_os ? 'Yes' : 'No'}\n`;
+                        body += `- **Gateway:** ${gatewayStr}, UniFi OS: ${info.gateway.is_unifi_os ? 'Ja' : 'Nein'}\n`;
                     }
                 } catch (error) {
                     body += `- **Tool:** Wi-Fi Stalker {{ version }}\n`;
